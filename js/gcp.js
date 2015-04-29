@@ -12,6 +12,9 @@ var NUM_GCX_SWITCHES = 8;
 var NUM_SWITCH_FCN = 8;
 var NUM_INSTANT_ACCESS = 8;
 
+var NUM_BANKS = 20;
+var NUM_PRESETS_PER_BANK = 10;
+
 var PREAMBLE = [0xF0, 0x00, 0x00, 0x07, 0x10];
 var TERMINATOR = [0xF7];
 
@@ -25,6 +28,19 @@ var CONFIG_OFFSET = PREAMBLE.length;
 var PRESET_OFFSET = CONFIG_OFFSET + CONFIG_NUM_BYTES;
 var TERMINATOR_OFFSET = PRESET_OFFSET + (PRESET_NUM_BYTES * NUM_PRESETS);
 
+var DeviceProgramChange = function(){
+    this.onOff = 0;
+    this.pc = 0;
+};
+DeviceProgramChange.prototype.init = function(arrayBuffer){
+    var view = new Uint8Array(arrayBuffer);
+    this.onOff = view.getUint8(0);
+    this.pc = view.getUint8(1);
+};
+DeviceProgramChange.prototype.compile = function(){
+    return [this.onOff, this.pc];
+};
+
 var Preset = function(){
     this.name = " INIT     ";
     this.deviceProgramChanges = [];
@@ -34,13 +50,104 @@ var Preset = function(){
     this.gcxLoopStates = [];
     this.gcxToggles = [];
     this.instantAccessState = [];
+
+    this.LENGTHS = {};
+    this.LENGTHS.name = PRESET_NAME_LENGTH;
+    this.LENGTHS.deviceProgramChanges = NUM_DEVICES * 2;
+    this.LENGTHS.deviceProgramBanks = 8;
+    this.LENGTHS.pedalDefinitions = NUM_PEDALS;
+    this.LENGTHS.pedalDeviceAssignments = NUM_PEDALS;
+    this.LENGTHS.gcxLoopStates = NUM_GCX * NUM_GCX_LOOPS;
+    this.LENGTHS.gcxToggles = NUM_GCX;
+    this.LENGTHS.instantAccessState = NUM_INSTANT_ACCESS;
+
+    this.OFFSETS = {};
+
+    var i, begin, end;
+
+    var keys = Object.keys(this.LENGTHS);
+
+    for(i = 0; i < keys.length; i++){
+        this.OFFSETS[keys[i]] = i == 0 ? 0 : this.OFFSETS[keys[i-1]] + this.LENGTHS[keys[i-1]];
+    }
+
+    for(i = 0; i < NUM_DEVICES; i++){
+        this.deviceProgramChanges[i] = new DeviceProgramChange();
+    }
+    for(i = 0; i < NUM_PEDALS; i++){
+        this.pedalDefinitions[i] = 0;
+        this.pedalDeviceAssignments[i] = 1;
+    }
+    for(i = 0; i < NUM_GCX * NUM_GCX_LOOPS; i++ ){
+        this.gcxLoopStates[i] = 0;
+    }
+    for(i = 0; i < NUM_GCX; i++){
+        this.gcxToggles[i] = 0;
+    }
+    for(i = 0; i < NUM_INSTANT_ACCESS; i++){
+        this.instantAccessState[i] = 0;
+    }
 };
 Preset.prototype.init = function(arrayBuffer){
     var view = new Uint8Array(arrayBuffer);
     var i, begin, end;
+
+    this.name = Array.prototype.join.call(view.slice(0, PRESET_NAME_LENGTH));
+
+    for(i = 0; i < NUM_DEVICES; i++){
+        begin = this.OFFSETS.deviceProgramChanges + (i*2);
+        end = begin + 2;
+        this.deviceProgramChanges[i].init(view.slice(begin, end));
+    }
+
+    for(i = 0; i < NUM_PEDALS; i++){
+        this.pedalDefinitions[i] = view.getUint8(this.OFFSETS.pedalDefinitions + i);
+        this.pedalDeviceAssignments[i] = view.getUint8(this.OFFSETS.pedalDeviceAssignments + i);
+    }
+
+    for(i = 0; i < NUM_GCX * NUM_GCX_LOOPS; i++ ){
+        this.gcxLoopStates[i] = view.getUint8(this.OFFSETS.gcxLoopStates + i);
+    }
+
+    for(i = 0; i < NUM_GCX; i++){
+        this.gcxToggles[i] = view.getUint8(this.OFFSETS.gcxToggles + i);
+    }
+    for(i = 0; i < NUM_INSTANT_ACCESS; i++){
+        this.instantAccessState[i] = view.getUint8(this.OFFSETS.instantAccessState + i);
+    }
 };
 Preset.prototype.compile = function(){
+    var self = this;
     var buffer = new Array(PRESET_NUM_BYTES);
+
+    var i;
+
+    for(i = 0; i < PRESET_NAME_LENGTH; i++){
+        buffer[i] = this.name.charCodeAt(i);
+    }
+
+    for(i = 0; i < NUM_DEVICES; i++){
+        var b = this.deviceProgramChanges[i].compile();
+        b.forEach(function(e, j){
+            buffer[self.OFFSETS.deviceProgramChanges + (i*2) + j] = e;
+        });
+    }
+    for(i = 0; i < this.deviceProgramBanks.length; i++){
+        buffer[this.OFFSETS.deviceProgramBanks + i] = this.deviceProgramBanks[i];
+    }
+    for(i = 0; i < NUM_PEDALS; i++){
+        buffer[this.OFFSETS.pedalDefinitions + i] = this.pedalDefinitions[i];
+        buffer[this.OFFSETS.pedalDeviceAssignments + i] = this.pedalDeviceAssignments[i];
+    }
+    for(i = 0; i < NUM_GCX * NUM_GCX_LOOPS; i++ ){
+        buffer[this.OFFSETS.gcxLoopStates + i] = this.gcxLoopStates[i];
+    }
+    for(i = 0; i < NUM_GCX; i++){
+        buffer[this.OFFSETS.gcxToggles + i] = this.gcxToggles[i];
+    }
+    for(i = 0; i < NUM_INSTANT_ACCESS; i++){
+        buffer[this.OFFSETS.instantAccessState + i] = this.instantAccessState[i];
+    }
 
     return buffer;
 };
@@ -50,6 +157,9 @@ var SoftOptions = function(){
 };
 SoftOptions.prototype.init = function(val){
     this.val = val;
+};
+SoftOptions.prototype.compile = function(){
+    return [0];
 };
 
 var Config = function () {
@@ -64,8 +174,8 @@ var Config = function () {
     this.gcxSwitchTypes = [];
     this.programAccessMode = 0x00;
     this.softOptions = new SoftOptions();
-    this.directorySpeed = 0x01;
-    this.programChangeReceiveChannel = 0x00;
+    this.directorySpeed = 0x02;
+    this.programChangeReceiveChannel = 0x01;
     this.switchFunctions = [];
     this.switchFunctionDetails = [];
     this.switchTransmitCC = [];
@@ -116,7 +226,7 @@ var Config = function () {
 
     for(i = 0; i < NUM_GCX_SWITCHES; i++){
         this.switchFunctions[i] = 0;
-        this.switchFunctionDetails[i] = 0;
+        this.switchFunctionDetails[i] = i;
         this.switchTransmitCC[i] = 0;
         this.switchType[i] = 0;
     }
