@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html class="no-js">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+        <title>Ground Control Pro Editor</title>
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="css/main.css">
+    </head>
+    <body>
+        <div id="logo">
+            <p>Ground Control Pro Editor</p>
+        </div>
+
+        <div id="gcp_wrapper">
+            <div class="panel-group" id="gcp" role="tablist" aria-multiselectable="true">
+                <div class="panel panel-default">
+                    <div class="panel-heading" role="tab" id="configHeader">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#gcp" href="#configPanel" aria-expanded="true" aria-controls="configPanel">Configuration</a>
+                        </h4>
+                    </div>
+                    <div id="configPanel" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="configHeader">
+                        <div class="panel-body">
+
+                            <div role="tabpanel">
+
+                                <ul class="nav nav-tabs" role="tablist">
+                                    <li role="presentation" class="active">
+                                        <a href="#devices" aria-controls="devices" role="tab" data-toggle="tab">Devices</a>
+                                    </li>
+                                    <li role="presentation">
+                                        <a href="#pedals" aria-controls="pedals" role="tab" data-toggle="tab">Pedals</a>
+                                    </li>
+                                    <li role="presentation">
+                                        <a href="#expanders" aria-controls="expanders" role="tab" data-toggle="tab">Expanders</a>
+                                    </li>
+                                </ul>
+
+                                <div class="tab-content">
+                                    <div role="tabpanel" class="tab-pane active" id="devices">
+                                        <div class="device" data-device="0">
+                                            <div class="checkbox">
+                                                <label>
+                                                    <input type="checkbox" class="device_enabled"> <span class="device_enabled_title">Device #1</span>
+                                                </label>
+                                            </div>
+                                            <form class="form-inline">
+                                                <fieldset>
+                                                    <div class="form-group">
+                                                        <label>Name <input type="text" class="form-control deviceName" size="8"></label>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label>Channel <input type="text" class="form-control deviceChannel" size="2"></label>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label>Program Offset <select class="form-control deviceProgramOffset"><option value="0">1..128</option><option value="1">0..127</option></select></label>
+                                                    </div>
+                                                </fieldset>
+                                            </form>
+                                        </div>
+                                        <!-- Replicated by js -->
+                                    </div>
+                                    <div role="tabpanel" class="tab-pane" id="pedals">
+
+                                    </div>
+                                    <div role="tabpanel" class="tab-pane" id="expanders">
+
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel panel-default">
+                    <div class="panel-heading" role="tab" id="presetHeader">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#gcp" href="#presetPanel" aria-expanded="true" aria-controls="configPanel">Presets</a>
+                        </h4>
+                    </div>
+                    <div id="presetPanel" class="panel-collapse collapse" role="tabpanel" aria-labelledby="presetHeader">
+                        <div class="panel-body">
+                            <p>Presets go here</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button id="download" class="btn btn-default" type="button">Download .syx</button>
+        </div>
+
+        <div id="drop">
+            <div id="drop_zone">Drop .syx file here</div>
+        </div>
+
+        <div id="about">
+            <div class="row">
+                <div class="col-md-2"></div>
+                <div class="col-md-4">
+                    <h1>About</h1>
+                </div>
+                <div class="col-md-4">
+                    <h1>Instructions</h1>
+
+                    <h1>Disclaimers</h1>
+
+                </div>
+                <div class="col-md-2"></div>
+            </div>
+        </div>
+
+        <script src="bower_components/jquery/dist/jquery.min.js"></script>
+        <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+        <script src="bower_components/file-saver.js/FileSaver.js"></script>
+        <script src="bower_components/sprintf.js/dist/sprintf.min.js"></script>
+        <script src="js/gcp.js"></script>
+        <script src="js/main.js"></script>
+    </body>
+</html>

@@ -1,0 +1,13 @@
+#drop_zone {
+    border: 2px dashed #bbb;
+    border-radius: 5px;
+    padding: 25px;
+    text-align: center;
+    width: 40%;
+    margin: 0 auto;
+}
+
+.device {
+    display: inline-block;
+    width: 49%;
+}

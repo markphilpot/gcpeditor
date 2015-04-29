@@ -35,6 +35,22 @@ var Preset = function(){
     this.gcxToggles = [];
     this.instantAccessState = [];
 };
+Preset.prototype.init = function(arrayBuffer){
+    var view = new Uint8Array(arrayBuffer);
+    var i, begin, end;
+};
+Preset.prototype.compile = function(){
+    var buffer = new Array(PRESET_NUM_BYTES);
+
+    return buffer;
+};
+
+var SoftOptions = function(){
+    this.val = 0;
+};
+SoftOptions.prototype.init = function(val){
+    this.val = val;
+};
 
 var Config = function () {
     this.deviceNames = [];
@@ -144,6 +160,49 @@ Config.prototype.init = function(arrayBuffer){
         this.switchType[i] = view.getUint8(this.OFFSETS.switchType + i);
     }
 };
+
+Config.prototype.compile = function(){
+    var buffer = new Array(CONFIG_NUM_BYTES);
+
+    var i, j;
+
+    for(i = 0; i < NUM_DEVICES; i++){
+        for(j = 0; j < DEVICE_NAME_LENGTH; j++){
+            buffer[(i*DEVICE_NAME_LENGTH)+j] = this.deviceNames[i].charCodeAt(j);
+        }
+
+        buffer[this.OFFSETS.deviceChannels+i] = this.deviceChannels[i];
+        buffer[this.OFFSETS.deviceProgramOffsets+i] = this.deviceProgramOffsets[i];
+        buffer[this.OFFSETS.deviceDefinitions+i] = this.deviceDefinitions[i];
+    }
+
+    for(i = 0; i < NUM_PEDALS; i++){
+        buffer[this.OFFSETS.pedalsExist+i] = this.pedalsExist[i];
+    }
+
+    buffer[this.OFFSETS.extendedMem] = this.extendedMem;
+    buffer[this.OFFSETS.vcaExists] = this.vcaExists;
+    buffer[this.OFFSETS.numGCX] = this.numGCX;
+
+    for(i = 0; i < this.LENGTHS.gcxSwitchTypes; i++){
+        buffer[this.OFFSETS.gcxSwitchTypes+i] = this.gcxSwitchTypes[i];
+    }
+
+    buffer[this.OFFSETS.programAccessMode] = this.programAccessMode;
+    buffer[this.OFFSETS.softOptions] = this.softOptions.compile()[0];
+    buffer[this.OFFSETS.directorySpeed] = this.directorySpeed;
+    buffer[this.OFFSETS.programChangeReceiveChannel] = this.programChangeReceiveChannel;
+
+    for(i = 0; i < NUM_GCX_SWITCHES; i++){
+        buffer[this.OFFSETS.switchFunctions+i] = this.switchFunctions[i];
+        buffer[this.OFFSETS.switchFunctionDetails+i] = this.switchFunctionDetails[i];
+        buffer[this.OFFSETS.switchTransmitCC+i] = this.switchTransmitCC[i];
+        buffer[this.OFFSETS.switchType+i] = this.switchType[i];
+    }
+
+    return buffer;
+};
+
 
 var GcpSyxEx = function(){
     this.sysEx = new DataView(new ArrayBuffer(SYSEX_NUM_BYTES));
