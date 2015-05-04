@@ -57,7 +57,24 @@
                                                         <label>Name <input type="text" class="form-control deviceName" size="8"></label>
                                                     </div>
                                                     <div class="form-group">
-                                                        <label>Channel <input type="text" class="form-control deviceChannel" size="2"></label>
+                                                        <label>Channel <select class="form-control deviceChannel">
+                                                            <option>1</option>
+                                                            <option>2</option>
+                                                            <option>3</option>
+                                                            <option>4</option>
+                                                            <option>5</option>
+                                                            <option>6</option>
+                                                            <option>7</option>
+                                                            <option>8</option>
+                                                            <option>9</option>
+                                                            <option>10</option>
+                                                            <option>11</option>
+                                                            <option>12</option>
+                                                            <option>13</option>
+                                                            <option>14</option>
+                                                            <option>15</option>
+                                                            <option>16</option>
+                                                        </select></label>
                                                     </div>
                                                     <div class="form-group">
                                                         <label>Program Offset <select class="form-control deviceProgramOffset"><option value="0">1..128</option><option value="1">0..127</option></select></label>
@@ -89,7 +106,34 @@
                     </div>
                     <div id="presetPanel" class="panel-collapse collapse" role="tabpanel" aria-labelledby="presetHeader">
                         <div class="panel-body">
-                            <p>Presets go here</p>
+
+                            <div role="tabpanel">
+
+                                <ul class="nav nav-tabs" role="tablist">
+                                    <li role="presentation" class="active">
+                                        <a href="#bank0" aria-controls="presets" role="tab" data-toggle="tab">Bank 0</a>
+                                    </li>
+                                    <!-- Replicated by js -->
+                                </ul>
+
+                                <div class="tab-content">
+                                    <div role="tabpanel" class="tab-pane active" id="bank0">
+                                        <div class="preset" data-preset="0">
+                                            <form class="form-inline">
+                                                <div class="form-group">
+                                                    <label>Preset <span class="preset-label-num">0</span> <input type="text" class="form-control presetName" size="10"></label>
+                                                </div>
+                                                <div class="deviceProgramChanges form-group">
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <!-- Replicated by js -->
+                                    </div>
+                                    <!-- Replicated by js -->
+                                </div>
+
+                            </div>
+
                         </div>
                     </div>
                 </div>

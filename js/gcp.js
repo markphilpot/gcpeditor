@@ -88,6 +88,12 @@ var Preset = function(){
         this.instantAccessState[i] = 0;
     }
 };
+
+Preset.prototype.setPresetName = function(name){
+    // TODO character validation
+    this.name = name;
+};
+
 Preset.prototype.init = function(arrayBuffer){
     var view = new Uint8Array(arrayBuffer);
     var i, begin, end;
@@ -231,6 +237,21 @@ var Config = function () {
         this.switchType[i] = 0;
     }
 };
+
+Config.prototype.isDeviceEnabled = function(d){
+    if(d < 0 || d > NUM_DEVICES){
+        console.warn("Device number out of bounds");
+        return false;
+    } else {
+        return this.deviceChannels[d] != 0;
+    }
+};
+
+Config.prototype.setDeviceName = function(d, name){
+    // TODO validate character set
+    this.deviceNames[d] = name;
+};
+
 Config.prototype.init = function(arrayBuffer){
     var view = new Uint8Array(arrayBuffer);
     var i, begin, end;
