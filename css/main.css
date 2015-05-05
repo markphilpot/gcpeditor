@@ -11,3 +11,39 @@
     display: inline-block;
     width: 49%;
 }
+
+#gcp_wrapper {
+    width: 70%;
+    margin: 0 auto;
+}
+
+#buttons_wrapper {
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.tab-content {
+    padding: 4px;
+}
+
+.device form {
+    margin-left: 16px;
+}
+
+.deviceProgramChanges {
+    border: 1px dashed #ddd;
+    padding: 2px;
+}
+
+.preset {
+    margin-bottom: 4px;
+}
+
+.preset_device_change {
+    margin-left: 4px;
+    margin-right: 8px;
+}
+
+.preset_device_change:last-of-type {
+    margin-right: 2px;
+}

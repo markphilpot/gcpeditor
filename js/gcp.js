@@ -1,7 +1,4 @@
-
 var SYSEX_NUM_BYTES = 16567;
-
-var ALLOWED_NAME_CHARACTERS = " ABCDEFGHIJKLMNOPQRSTUVWXYZ"; // TODO find out special characters
 
 var NUM_DEVICES = 8;
 var NUM_PRESETS = 200;
@@ -28,6 +25,15 @@ var CONFIG_OFFSET = PREAMBLE.length;
 var PRESET_OFFSET = CONFIG_OFFSET + CONFIG_NUM_BYTES;
 var TERMINATOR_OFFSET = PRESET_OFFSET + (PRESET_NUM_BYTES * NUM_PRESETS);
 
+function pad(pad, str, padLeft) {
+  if (str == undefined) return pad;
+  if (padLeft) {
+    return (pad + str).slice(-pad.length);
+  } else {
+    return (str + pad).substring(0, pad.length);
+  }
+}
+
 var DeviceProgramChange = function(){
     this.onOff = 0;
     this.pc = 0;
@@ -42,7 +48,7 @@ DeviceProgramChange.prototype.compile = function(){
 };
 
 var Preset = function(){
-    this.name = " INIT     ";
+    this.name = pad('          ', ' INIT');
     this.deviceProgramChanges = [];
     this.deviceProgramBanks = [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]; // Unused
     this.pedalDefinitions = [];
@@ -91,7 +97,11 @@ var Preset = function(){
 
 Preset.prototype.setPresetName = function(name){
     // TODO character validation
-    this.name = name;
+    this.name = pad('          ', name.replace(/\s+$/g, "").toUpperCase());
+    return this.getPresetName();
+};
+Preset.prototype.getPresetName = function(){
+    return this.name.replace(/\s+$/g, "");
 };
 
 Preset.prototype.init = function(arrayBuffer){
@@ -249,7 +259,11 @@ Config.prototype.isDeviceEnabled = function(d){
 
 Config.prototype.setDeviceName = function(d, name){
     // TODO validate character set
-    this.deviceNames[d] = name;
+    this.deviceNames[d] = pad('        ', name.replace(/\s+$/g, "").toUpperCase());
+    return this.getDeviceName(d);
+};
+Config.prototype.getDeviceName = function(d){
+    return this.deviceNames[d].replace(/\s+$/g, "");
 };
 
 Config.prototype.init = function(arrayBuffer){

@@ -85,7 +85,7 @@ function renderPreset(){
             for(var i = 0; i < NUM_DEVICES; i++){
                 if(gcp.config.isDeviceEnabled(i)){
                     var $d = $(sprintf('<div class="checkbox"><label><input type="checkbox" class="preset_device_enabled" data-device="%d"> <span class="preset_device_enabled_title">%s</span></label></div>', i, gcp.config.deviceNames[i])).appendTo($changes);
-                    var $select = $(sprintf('<input type="text" class="preset_device_change" data-device="%d" size="3"/>', i)).appendTo($changes);
+                    var $select = $(sprintf('<input type="text" class="preset_device_change form-control" data-device="%d" size="3"/>', i)).appendTo($changes);
                 }
             }
         };
@@ -95,7 +95,15 @@ function renderPreset(){
         });
 
         $p.find('.presetName').blur(function(){
-            gcp.presets[pNum].setPresetName($(this).val());
+            $(this).val(gcp.presets[pNum].setPresetName($(this).val()));
+        }).keyup(function(){
+            $(this).val(
+                $(this).val().replace(/[^a-zA-Z0-9 \-><]/g, function(str){
+                    return '';
+                })
+            );
+        }).focusin(function(){
+            $(this).val($(this).val().replace(/\s+$/g, ""));
         });
 
         sync();
@@ -148,8 +156,16 @@ function renderConfig(){
         });
 
         $d.find('.deviceName').blur(function(){
-            gcp.config.setDeviceName(dNum, $(this).val());
+            $(this).val(gcp.config.setDeviceName(dNum, $(this).val()));
             $(document).trigger('config:deviceName:change', [{device: dNum}]);
+        }).keyup(function(){
+            $(this).val(
+                $(this).val().replace(/[^a-zA-Z0-9 \-><]/g, function(str){
+                    return '';
+                })
+            );
+        }).focusin(function(){
+            $(this).val($(this).val().replace(/\s+$/g, ""));
         });
     });
 

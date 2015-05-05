@@ -11,6 +11,7 @@
 
         <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
         <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="bower_components/jquery-ui-bootstrap/jquery.ui.theme.css">
         <link rel="stylesheet" href="css/main.css">
     </head>
     <body>
@@ -26,7 +27,7 @@
                             <a data-toggle="collapse" data-parent="#gcp" href="#configPanel" aria-expanded="true" aria-controls="configPanel">Configuration</a>
                         </h4>
                     </div>
-                    <div id="configPanel" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="configHeader">
+                    <div id="configPanel" class="panel-collapse collapse" role="tabpanel" aria-labelledby="configHeader">
                         <div class="panel-body">
 
                             <div role="tabpanel">
@@ -104,7 +105,7 @@
                             <a data-toggle="collapse" data-parent="#gcp" href="#presetPanel" aria-expanded="true" aria-controls="configPanel">Presets</a>
                         </h4>
                     </div>
-                    <div id="presetPanel" class="panel-collapse collapse" role="tabpanel" aria-labelledby="presetHeader">
+                    <div id="presetPanel" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="presetHeader">
                         <div class="panel-body">
 
                             <div role="tabpanel">
@@ -138,7 +139,11 @@
                     </div>
                 </div>
             </div>
-            <button id="download" class="btn btn-default" type="button">Download .syx</button>
+            <div id="buttons_wrapper">
+                <button id="copy-presets" class="btn btn-default" type="button">Copy Presets</button>
+                <button id="import-presets" class="btn btn-default" type="button">Import Presets</button>
+                <button id="download" class="btn btn-default" type="button">Download .syx</button>
+            </div>
         </div>
 
         <div id="drop">
@@ -165,6 +170,7 @@
         <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
         <script src="bower_components/file-saver.js/FileSaver.js"></script>
         <script src="bower_components/sprintf.js/dist/sprintf.min.js"></script>
+        <script src="bower_components/jquery-ui/jquery-ui.min.js"></script>
         <script src="js/gcp.js"></script>
         <script src="js/main.js"></script>
     </body>
