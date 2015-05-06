@@ -3,6 +3,8 @@ var gcp = new GcpSyxEx();
 $(function(){
     $.event.props.push('dataTransfer');
 
+    init();
+
     render();
 
     var $drop = $("#drop_zone");
@@ -24,9 +26,9 @@ $(function(){
         reader.onloadend = function(){
             gcp.init(reader.result);
 
-            $("#gcp").html("");
-
             render();
+
+            $('#presetPanel').collapse('toggle');
         };
         reader.readAsArrayBuffer(f);
     });
@@ -36,13 +38,17 @@ $(function(){
     });
 });
 
-function render(){
-    renderConfig();
-    renderPreset();
-}
-
-function renderPreset(){
+function init(){
     var $base = $('#gcp');
+
+    var $deviceConfig = $base.find('#configPanel .device');
+
+    for(var i = 1; i < NUM_DEVICES; i++){
+        var $clone = $deviceConfig.clone().appendTo($('#devices'));
+
+        $clone.attr('data-device', i);
+        $clone.find('span.device_enabled_title').html(sprintf("Device #%d", i+1));
+    }
 
     var $bankList = $base.find('#presetPanel .tab-content');
     var $bankNav = $base.find('#presetPanel .nav-tabs');
@@ -70,6 +76,16 @@ function renderPreset(){
         $clone.attr('data-preset', i);
         $clone.find('.preset-label-num').html(i);
     }
+}
+
+function render(){
+    renderConfig();
+    renderPreset();
+}
+
+function renderPreset(){
+
+    var $base = $('#gcp');
 
     $base.find("#presetPanel .preset").each(function(){
         var $p = $(this);
@@ -113,15 +129,6 @@ function renderPreset(){
 function renderConfig(){
 
     var $base = $('#gcp');
-
-    var $deviceConfig = $base.find('#configPanel .device');
-
-    for(var i = 1; i < NUM_DEVICES; i++){
-        var $clone = $deviceConfig.clone().appendTo($('#devices'));
-
-        $clone.attr('data-device', i);
-        $clone.find('span.device_enabled_title').html(sprintf("Device #%d", i+1));
-    }
 
     $base.find('#configPanel .device').each(function(){
         var $d = $(this);

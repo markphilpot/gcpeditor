@@ -39,7 +39,7 @@ var DeviceProgramChange = function(){
     this.pc = 0;
 };
 DeviceProgramChange.prototype.init = function(arrayBuffer){
-    var view = new Uint8Array(arrayBuffer);
+    var view = new DataView(arrayBuffer);
     this.onOff = view.getUint8(0);
     this.pc = view.getUint8(1);
 };
@@ -105,15 +105,17 @@ Preset.prototype.getPresetName = function(){
 };
 
 Preset.prototype.init = function(arrayBuffer){
-    var view = new Uint8Array(arrayBuffer);
+    var view = new DataView(arrayBuffer);
     var i, begin, end;
 
-    this.name = Array.prototype.join.call(view.slice(0, PRESET_NAME_LENGTH));
+    var decoder = new TextDecoder();
+
+    this.name = decoder.decode(new DataView(arrayBuffer.slice(0, PRESET_NAME_LENGTH)));
 
     for(i = 0; i < NUM_DEVICES; i++){
         begin = this.OFFSETS.deviceProgramChanges + (i*2);
         end = begin + 2;
-        this.deviceProgramChanges[i].init(view.slice(begin, end));
+        this.deviceProgramChanges[i].init(arrayBuffer.slice(begin, end));
     }
 
     for(i = 0; i < NUM_PEDALS; i++){
@@ -267,13 +269,15 @@ Config.prototype.getDeviceName = function(d){
 };
 
 Config.prototype.init = function(arrayBuffer){
-    var view = new Uint8Array(arrayBuffer);
+    var view = new DataView(arrayBuffer);
     var i, begin, end;
+
+    var decoder = new TextDecoder();
 
     for(i = 0; i < NUM_DEVICES; i++){
         begin = this.OFFSETS.deviceNames + (i * DEVICE_NAME_LENGTH);
         end = begin + DEVICE_NAME_LENGTH;
-        this.deviceNames[i] = Array.prototype.join.call(view.slice(begin, end));
+        this.deviceNames[i] = decoder.decode(new DataView(arrayBuffer.slice(begin, end)));
 
         this.deviceChannels[i] = view.getUint8(this.OFFSETS.deviceChannels + i);
         this.deviceProgramOffsets[i] = view.getUint8(this.OFFSETS.deviceProgramOffsets + i);
