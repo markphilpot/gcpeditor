@@ -36,6 +36,62 @@ $(function(){
     $('#download').click(function(){
         gcp.download();
     });
+
+    $('#copy-presets').click(function(){
+
+        if($(this).attr('data-next') == 'done') {
+            $(this).attr('data-next', 'copy');
+            $(this).html("Done");
+
+            $('#presetPanel .preset').each(function () {
+                var $p = $(this);
+                var pNum = $p.attr('data-preset');
+
+                var $cp = $('<button class="copy-p btn btn-default" type="button">Copy..</button>').appendTo($p.find('form'));
+
+                $cp.click(function(){
+                    bootbox.prompt({
+                        title: sprintf("Copy preset %d to target (overwrite)", pNum),
+                        callback: function(result){
+
+
+                            if(result === null){
+                                // Dismiss
+                            } else {
+                                var t = parseInt(result, 10);
+
+                                if(t < 0 || t > 199){
+                                    $.jGrowl(sprintf("Invalid target preset (%d)", t));
+                                    return;
+                                }
+
+                                // Perform copy
+                                var src = gcp.presets[pNum];
+
+                                var target = gcp.presets[t];
+
+                                var b = src.compile();
+                                var ab = new DataView(new ArrayBuffer(PRESET_NUM_BYTES));
+
+                                for(var i = 0; i < b.length; i++){
+                                    ab.setUint8(i, b[i]);
+                                }
+
+                                target.init(ab.buffer);
+
+                                $(document).trigger('presets:copy', [{src: pNum, target: t}]);
+                            }
+                        }
+                    })
+                });
+            });
+        } else {
+            $(this).attr('data-next', 'done');
+            $(this).html("Copy Presets");
+            $('.copy-p').remove();
+        }
+
+    });
 });
 
 function init(){
@@ -101,12 +157,17 @@ function renderPreset(){
             for(var i = 0; i < NUM_DEVICES; i++){
                 if(gcp.config.isDeviceEnabled(i)){
                     var $d = $(sprintf('<div class="checkbox"><label><input type="checkbox" class="preset_device_enabled" data-device="%d"> <span class="preset_device_enabled_title">%s</span></label></div>', i, gcp.config.deviceNames[i])).appendTo($changes);
-                    var $select = $(sprintf('<input type="text" class="preset_device_change form-control" data-device="%d" size="3"/>', i)).appendTo($changes);
+
+                    $d.find('input').prop('checked', gcp.presets[pNum].deviceProgramChanges[i].onOff == 0 ? false : true);
+
+                    var $input = $(sprintf('<input type="text" class="preset_device_change form-control" data-device="%d" size="3"/>', i)).appendTo($changes);
+
+                    $input.val(gcp.presets[pNum].deviceProgramChanges[i].pc);
                 }
             }
         };
 
-        $(document).on('config:deviceName:change config:deviceEnabled:change', function(event, data){
+        $(document).on('config:deviceName:change config:deviceEnabled:change presets:copy', function(event, data){
             sync();
         });
 
