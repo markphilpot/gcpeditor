@@ -24,6 +24,12 @@ $(function(){
         var reader = new FileReader();
 
         reader.onloadend = function(){
+
+            if(reader.result.byteLength != SYSEX_NUM_BYTES){
+                $.jGrowl("Invalid syx file");
+                return;
+            }
+
             gcp.init(reader.result);
 
             render();
@@ -158,7 +164,7 @@ function renderPreset(){
                 if(gcp.config.isDeviceEnabled(i)){
                     var $d = $(sprintf('<div class="checkbox"><label><input type="checkbox" class="preset_device_enabled" data-device="%d"> <span class="preset_device_enabled_title">%s</span></label></div>', i, gcp.config.deviceNames[i])).appendTo($changes);
 
-                    $d.find('input').prop('checked', gcp.presets[pNum].deviceProgramChanges[i].onOff == 0 ? false : true);
+                    $d.find('input').prop('checked', gcp.presets[pNum].deviceProgramChanges[i].onOff != 0);
 
                     var $input = $(sprintf('<input type="text" class="preset_device_change form-control" data-device="%d" size="3"/>', i)).appendTo($changes);
 
@@ -169,6 +175,15 @@ function renderPreset(){
 
         $(document).on('config:deviceName:change config:deviceEnabled:change presets:copy', function(event, data){
             sync();
+        });
+
+        $p.find('.preset_device_enabled').click(function(){
+            var dNum = $(this).attr('data-device');
+            if($(this).prop('checked')){
+                gcp.presets[pNum].deviceProgramChanges[dNum].onOff = 1;
+            } else {
+                gcp.presets[pNum].deviceProgramChanges[dNum].onOff = 0;
+            }
         });
 
         $p.find('.presetName').blur(function(){
