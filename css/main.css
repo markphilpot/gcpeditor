@@ -18,7 +18,7 @@
     text-shadow: 1px 1px 2px #333;
 }
 
-#drop_zone {
+#drop_zone, .import_drop {
     border: 2px dashed #bbb;
     border-radius: 5px;
     padding: 25px;
@@ -66,4 +66,8 @@
 
 .preset_device_change:last-of-type {
     margin-right: 2px;
+}
+
+.ui-dialog-titlebar-close {
+  visibility: hidden;
 }

@@ -98,6 +98,123 @@ $(function(){
         }
 
     });
+
+    $('#import-presets').click(function(){
+
+        var altGcp = new GcpSyxEx();
+
+        var $dialog = $('<div/>').appendTo($('body'));
+
+        $("<p>Import presets from an alternate syx file</p>").appendTo($dialog);
+
+        var $drop = $('<div class="import_drop">Drop .syx file here</div>').appendTo($dialog);
+
+        $drop.bind('dragover', function(e){
+            e.stopPropagation();
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'copy';
+        });
+
+        $drop.bind('drop', function(e){
+            e.stopPropagation();
+            e.preventDefault();
+
+            var f = e.dataTransfer.files[0];
+
+            var reader = new FileReader();
+
+            reader.onloadend = function(){
+
+                if(reader.result.byteLength != SYSEX_NUM_BYTES){
+                    $.jGrowl("Invalid syx file");
+                    return;
+                }
+
+                altGcp.init(reader.result);
+
+                // Show import table
+                $drop.remove();
+
+                var $table = $('<table/>').appendTo($dialog);
+
+                var $theader = $('<thead/>').appendTo($table);
+                $('<tr></tr><th>&nbsp</th><th>Preset</th><th>Name</th><th>Target</th></tr>').appendTo($theader);
+
+                var $tbody = $('<tbody/>').appendTo($table);
+
+                for(var i = 0; i < NUM_PRESETS; i++){
+                    var $tr = $(sprintf('<tr data-preset="%d"/>', i)).appendTo($tbody);
+                    $('<td><input type="checkbox"></td>').appendTo($tr);
+                    $(sprintf('<td>Preset %d</td>', i)).appendTo($tr);
+                    $(sprintf('<td>%s</td>', altGcp.presets[i].getPresetName())).appendTo($tr);
+                    $('<td><input class="target-preset" type="text" size="4" maxlength="3"></td>').appendTo($tr);
+                }
+
+                $table.dataTable({
+                    paging: false,
+                    info: false,
+                    scrollY: "100%"
+                });
+            };
+            reader.readAsArrayBuffer(f);
+        });
+
+        $dialog.dialog({
+            title: 'Import Presets',
+            autoOpen: true,
+            closeOnEscape: true,
+            width: 500,
+            height: 400,
+            buttons: [
+                {
+                    text: "Import",
+                    click: function(){
+
+                        $dialog.find('input:checked').each(function(){
+                            var srcNum = $(this).closest('tr').attr('data-preset');
+                            var targetNum = $(this).closest('tr').find('.target-preset').val();
+
+                            //TODO validate target
+                            srcNum = parseInt(srcNum, 10);
+                            targetNum = parseInt(targetNum, 10);
+
+                            // Perform copy
+                            var src = altGcp.presets[srcNum];
+
+                            var target = gcp.presets[targetNum];
+
+                            var b = src.compile();
+                            var ab = new DataView(new ArrayBuffer(PRESET_NUM_BYTES));
+
+                            for(var i = 0; i < b.length; i++){
+                                ab.setUint8(i, b[i]);
+                            }
+
+                            target.init(ab.buffer);
+
+                        });
+
+                        $(document).trigger('presets:import', [{}]);
+
+                        $dialog.dialog('close');
+
+                        $.jGrowl("Import complete");
+
+                    }
+                }, {
+                    text: "Cancel",
+                    click: function(){
+                        $dialog.dialog('close');
+                    }
+                }
+            ]
+        });
+
+        $dialog.on('dialogclose', function(e){
+            $dialog.remove();
+        });
+
+    });
 });
 
 function init(){
@@ -173,7 +290,7 @@ function renderPreset(){
             }
         };
 
-        $(document).on('config:deviceName:change config:deviceEnabled:change presets:copy', function(event, data){
+        $(document).on('config:deviceName:change config:deviceEnabled:change presets:copy presets:import', function(event, data){
             sync();
         });
 
