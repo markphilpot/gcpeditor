@@ -172,12 +172,47 @@ Preset.prototype.compile = function(){
 
 var SoftOptions = function(){
     this.val = 0;
+
+    this.PROG_MASK = 0x80;
+    this.PROG_UMASK = 0x7F;
+    this.PROG_SHIFT = 7;
+    this.LINK_MASK = 0x30;
+    this.LINK_UMASK = 0xCF;
+    this.LINK_SHIFT = 4;
+    this.RESPOND_MASK = 0x01;
+    this.RESPOND_UMASK = 0xFE;
+    this.RESPOND_SHIFT = 0;
+
 };
 SoftOptions.prototype.init = function(val){
     this.val = val;
 };
 SoftOptions.prototype.compile = function(){
-    return [0];
+    return [this.val];
+};
+
+SoftOptions.prototype.setRespond = function(v){
+    this.val &= this.RESPOND_UMASK;
+    this.val |= (v << this.RESPOND_SHIFT);
+};
+SoftOptions.prototype.getRespond = function(){
+    return (this.val & this.RESPOND_MASK) >> this.RESPOND_SHIFT;
+};
+
+SoftOptions.prototype.setGlobalProgram = function(v){
+    this.val &= this.PROG_UMASK;
+    this.val |= (v << this.PROG_SHIFT);
+};
+SoftOptions.prototype.getGlobalProgram = function(){
+    return (this.val & this.PROG_MASK) >> this.PROG_SHIFT;
+};
+
+SoftOptions.prototype.setLinkMode = function(v){
+    this.val &= this.LINK_UMASK;
+    this.val |= (v << this.LINK_SHIFT);
+};
+SoftOptions.prototype.getLinkMode = function(){
+    return (this.val & this.LINK_MASK) >> this.LINK_SHIFT;
 };
 
 var Config = function () {

@@ -461,4 +461,32 @@ function renderConfig(){
             gcp.config.switchType[btnNum] = +$(this).val();
         }).val(gcp.config.switchType[btnNum]);
     });
+
+    $base.find('.programAccessMode').change(function(){
+        gcp.config.programAccessMode = +$(this).val();
+    }).val(gcp.config.programAccessMode);
+
+    $base.find('.directorySpeed').change(function(){
+        gcp.config.directorySpeed = +$(this).val();
+    }).val(gcp.config.directorySpeed);
+
+    $base.find('.programReceiveChannel').change(function(){
+        gcp.config.programChangeReceiveChannel = +$(this).val();
+    }).val(gcp.config.programChangeReceiveChannel);
+
+    $base.find('.softOptions_respond').click(function(){
+        if($(this).prop('checked')) {
+            gcp.config.softOptions.setRespond(1);
+        } else {
+            gcp.config.softOptions.setRespond(0);
+        }
+    }).val(gcp.config.softOptions.getRespond());
+
+    $base.find('.softOptions_global').change(function(){
+        gcp.config.softOptions.setGlobalProgram(+$(this).val());
+    }).val(gcp.config.softOptions.getGlobalProgram());
+
+    $base.find('.softOptions_linkMode').change(function(){
+        gcp.config.softOptions.setLinkMode(+$(this).val());
+    }).val(gcp.config.softOptions.getLinkMode());
 }
