@@ -341,11 +341,129 @@ function renderPreset(){
         });
 
         $p.find('.presetPedals button').click(function(){
+            var $dialog = $('<div/>').appendTo($('body'));
 
+            var buildPC = function(p){
+                var $wrapper = $('<div class="form-group"></div>').appendTo($dialog);
+                var $label = $(sprintf('<label>Pedal %d Device </label>', p+1)).appendTo($wrapper);
+                var $sel = $(sprintf('<select class="form-control" data-p="%d"></select>', p)).appendTo($label);
+
+                for(var i = 0; i < NUM_DEVICES; i++){
+                    $(sprintf('<option value="%d">%d</option>', i+1, i+1)).appendTo($sel);
+                }
+
+                $sel.change(function(){
+                    gcp.presets[pNum].pedalDeviceAssignments[p] = +$(this).val();
+                }).val(gcp.presets[pNum].pedalDeviceAssignments[p]);
+
+                $wrapper = $('<div class="form-group"></div>').appendTo($dialog);
+                $label = $(sprintf('<label>Pedal %d MIDI Definition </label>', p+1)).appendTo($wrapper);
+                $sel = $(sprintf('<select class="form-control" data-p="%d"></select>', p)).appendTo($label);
+
+                if(gcp.presets[pNum].pedalDeviceAssignments[p] == 8 && gcp.config.vcaExists == 1){
+                    $('<option value="0">Off</option>').appendTo($sel);
+                    $('<option value="1">VCA Stereo</option>').appendTo($sel);
+                    $('<option value="2">VCA Pan</option>').appendTo($sel);
+                    $('<option value="3">VCA Left</option>').appendTo($sel);
+                    $('<option value="4">VCA Right</option>').appendTo($sel);
+                } else {
+                    $('<option value="0">Off</option>').appendTo($sel);
+                    $('<option value="1">Pitchbend</option>').appendTo($sel);
+                    $('<option value="2">Aftertouch</option>').appendTo($sel);
+                    for(var i = 3; i < 124; i++){
+                        $(sprintf('<option value="%d">MIDI Controller #%d</option>', i, i-2)).appendTo($sel);
+                    }
+                }
+
+                $sel.change(function(){
+                    gcp.presets[pNum].pedalDefinitions[p] = +$(this).val();
+                }).val(gcp.presets[pNum].pedalDefinitions[p]);
+            };
+
+            for(var i = 0; i < NUM_PEDALS; i++){
+                if(gcp.config.pedalsExist[i] == 1){
+                    buildPC(i);
+                }
+            }
+
+            $dialog.dialog({
+                title: sprintf('Preset %d Pedal Configuration', pNum),
+                autoOpen: true,
+                closeOnEscape: true,
+                width: 500,
+                height: 400,
+                buttons: [
+                    {
+                        text: "Close",
+                        click: function(){
+
+                            $dialog.dialog('close');
+
+                        }
+                    }
+                ]
+            });
+
+            $dialog.on('dialogclose', function(e){
+                $dialog.remove();
+            });
         });
 
         $p.find('.loopStates button').click(function(){
+            var $dialog = $('<div/>').appendTo($('body'));
 
+            var buildLS = function(ls, $w, gcx){
+                var $wrapper = $('<div class="form-group"></div>').appendTo($w);
+                var $label = $(sprintf('<label>GCX %d Loop %d State </label>', gcx+1, ls+1)).appendTo($wrapper);
+                var $sel = $('<select class="form-control"><option value="0">Off</option><option value="1">On</option></select>').appendTo($label);
+
+                $sel.change(function(){
+                    gcp.presets[pNum].gcxLoopStates[gcx*NUM_GCX_LOOPS+ls] = +$(this).val();
+                }).val(gcp.presets[pNum].gcxLoopStates[gcx*NUM_GCX_LOOPS+ls]);
+            };
+
+            var buildGCX = function(gcx){
+                var $gcxWrapper = $('<div class="gcxLoopState"/>').appendTo($dialog);
+                $(sprintf('<h4>GCX %d</h4>', gcx+1)).appendTo($gcxWrapper);
+                var $wrapper = $('<div class="form-group"></div>').appendTo($gcxWrapper);
+
+                var $label = $('<label>Send GCX Data </label>').appendTo($wrapper);
+                var $sel = $('<select class="form-control"><option value="0">Yes</option><option value="1">No</option></select>').appendTo($label);
+
+                $sel.change(function(){
+                    gcp.presets[pNum].gcxToggles[gcx] = +$(this).val();
+                }).val(gcp.presets[pNum].gcxToggles[gcx]);
+
+                for(var i = 0; i < NUM_GCX_LOOPS; i++){
+                    buildLS(i, $gcxWrapper, gcx);
+                }
+            };
+
+            for(var i = 0; i < gcp.config.numGCX; i++){
+                buildGCX(i);
+            }
+
+            $dialog.dialog({
+                title: sprintf('Preset %d GCX Loop Configuration', pNum),
+                autoOpen: true,
+                closeOnEscape: true,
+                width: 500,
+                height: 400,
+                buttons: [
+                    {
+                        text: "Close",
+                        click: function(){
+
+                            $dialog.dialog('close');
+
+                        }
+                    }
+                ]
+            });
+
+            $dialog.on('dialogclose', function(e){
+                $dialog.remove();
+            });
         });
 
         $p.find('.iaStates button').click(function(){
