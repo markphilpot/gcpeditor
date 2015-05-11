@@ -229,6 +229,15 @@ function init(){
         $clone.find('span.device_enabled_title').html(sprintf("Device #%d", i+1));
     }
 
+    var $iaButton = $base.find('#configPanel .instantAccessBtn');
+
+    for(var i = 1; i < NUM_INSTANT_ACCESS; i++){
+        var $clone = $iaButton.clone().appendTo($('#instant'));
+
+        $clone.attr('data-btn', i);
+        $clone.find('label span').html(i+1);
+    }
+
     var $bankList = $base.find('#presetPanel .tab-content');
     var $bankNav = $base.find('#presetPanel .nav-tabs');
 
@@ -369,6 +378,87 @@ function renderConfig(){
         });
     });
 
+    $base.find('.pedal').change(function(){
+        var p = +$(this).attr('data-pedal');
+        gcp.config.pedalsExist[p] = +$(this).val();
+    }).each(function(){
+        var p = +$(this).attr('data-pedal');
+        $(this).val(gcp.config.pedalsExist[p]);
+    });
+
+    $base.find('.vca').change(function(){
+        gcp.config.vcaExists = +$(this).val();
+    }).each(function(){
+        $(this).val(gcp.config.vcaExists);
+    });
+
+    $base.find('.numGCX').change(function(){
+        gcp.config.numGCX = +$(this).val();
+
+        var $wrapper = $('.gcxSwitchTypes');
+        $wrapper.html("");
+
+        for(var i = 0; i < gcp.config.numGCX; i++){
+            var $sw = $(sprintf('<div class="gcxSwitchType" data-gcx="%d"><h4>GCX %d<h4></h4></div>', i, i+1)).appendTo($wrapper);
+            for(var j = 0; j < NUM_GCX_SWITCHES; j++){
+                var $label = $(sprintf('<label>Switch %d</label>', j+1)).appendTo($sw);
+                var $sel = $('<select class="form-control"><option value="0">Latching</option><option value="1">Momentary</option></select>').appendTo($label);
+                $sel.change(function(){
+                    gcp.config.gcxSwitchTypes[i*NUM_GCX_SWITCHES+j] = +$(this).val();
+                }).val(gcp.config.gcxSwitchTypes[i*NUM_GCX_SWITCHES+j]);
+            }
+        }
 
 
+    }).val(gcp.config.numGCX);
+
+    $base.find('.instantAccessBtn').each(function(){
+        var $btn = $(this);
+        var btnNum = +$btn.attr('data-btn');
+
+        var renderFcnDetail = function(){
+
+            var $detailSel = $btn.find('.switchFunctionDetail');
+
+            $detailSel.html("");
+
+            if(gcp.config.switchFunctions[btnNum] < 4){
+                // GCX Loop #
+                for(var i = 0; i < NUM_GCX_LOOPS; i++){
+                    $(sprintf('<option value="%d">GCX Loop %d</option>', i, i+1)).appendTo($detailSel);
+                }
+
+                if(gcp.config.switchFunctionDetails[btnNum] >= NUM_GCX_LOOPS) {
+                    gcp.config.switchFunctionDetails[btnNum] = 0;
+                }
+
+            } else {
+                // MIDI Controller #
+                for (var i = 0; i < 121; i++) {
+                    $(sprintf('<option value="%d">MIDI Controller #%d</option>', i, i + 1)).appendTo($detailSel);
+                }
+            }
+
+            $detailSel.val(gcp.config.switchFunctionDetails[btnNum]);
+        };
+
+        renderFcnDetail();
+
+        $btn.find('.switchFunction').change(function(){
+            gcp.config.switchFunctions[btnNum] = +$(this).val();
+            renderFcnDetail();
+        }).val(gcp.config.switchFunctions[btnNum]);
+
+        $btn.find('.switchFunctionDetail').change(function(){
+            gcp.config.switchFunctionDetails[btnNum] = +$(this).val();
+        }).val(gcp.config.switchFunctionDetails[btnNum]);
+
+        $btn.find('.transmitCC').change(function(){
+            gcp.config.switchTransmitCC[btnNum] = +$(this).val();
+        }).val(gcp.config.switchTransmitCC[btnNum]);
+
+        $btn.find('.switchType').change(function(){
+            gcp.config.switchType[btnNum] = +$(this).val();
+        }).val(gcp.config.switchType[btnNum]);
+    });
 }

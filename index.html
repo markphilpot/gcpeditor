@@ -43,6 +43,7 @@
                             <div role="tabpanel">
 
                                 <ul class="nav nav-tabs" role="tablist">
+
                                     <li role="presentation" class="active">
                                         <a href="#devices" aria-controls="devices" role="tab" data-toggle="tab">Devices</a>
                                     </li>
@@ -52,6 +53,13 @@
                                     <li role="presentation">
                                         <a href="#expanders" aria-controls="expanders" role="tab" data-toggle="tab">Expanders</a>
                                     </li>
+                                    <li role="presentation">
+                                        <a href="#instant" aria-controls="instant" role="tab" data-toggle="tab">Instant Access</a>
+                                    </li>
+                                    <li role="presentation">
+                                        <a href="#utility" aria-controls="utility" role="tab" data-toggle="tab">Utility</a>
+                                    </li>
+
                                 </ul>
 
                                 <div class="tab-content">
@@ -96,9 +104,74 @@
                                         <!-- Replicated by js -->
                                     </div>
                                     <div role="tabpanel" class="tab-pane" id="pedals">
-
+                                        <div class="form-group">
+                                            <label>Pedal 1 <select class="form-control pedal" data-pedal="0"><option value="0">No</option><option value="1">Yes</option></select></label>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Pedal 2 <select class="form-control pedal" data-pedal="1"><option value="0">No</option><option value="1">Yes</option></select></label>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>VCA <select class="form-control vca"><option value="0">No</option><option value="1">Yes</option></select></label>
+                                        </div>
                                     </div>
                                     <div role="tabpanel" class="tab-pane" id="expanders">
+                                        <div class="form-group">
+                                            <label>Number of GCXs <select class="form-control numGCX">
+                                                <option value="0">0</option>
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                            </select></label>
+                                        </div>
+                                        <div class="form-group gcxSwitchTypes"></div>
+                                    </div>
+                                    <div role="tabpanel" class="tab-pane" id="instant">
+                                        <div class="form-group instantAccessBtn" data-btn="0">
+                                            <label>Button <span>1</span>
+                                                <select class="form-control switchFunction">
+                                                    <option value="0">GCX 1</option>
+                                                    <option value="1">GCX 2</option>
+                                                    <option value="2">GCX 3</option>
+                                                    <option value="3">GCX 4</option>
+                                                    <option value="4">Sequence Start/Stop</option>
+                                                    <option value="5">MIDI Channel #1</option>
+                                                    <option value="6">MIDI Channel #2</option>
+                                                    <option value="7">MIDI Channel #3</option>
+                                                    <option value="8">MIDI Channel #4</option>
+                                                    <option value="9">MIDI Channel #5</option>
+                                                    <option value="10">MIDI Channel #6</option>
+                                                    <option value="11">MIDI Channel #7</option>
+                                                    <option value="12">MIDI Channel #8</option>
+                                                    <option value="13">MIDI Channel #9</option>
+                                                    <option value="14">MIDI Channel #10</option>
+                                                    <option value="15">MIDI Channel #11</option>
+                                                    <option value="16">MIDI Channel #12</option>
+                                                    <option value="17">MIDI Channel #13</option>
+                                                    <option value="18">MIDI Channel #14</option>
+                                                    <option value="19">MIDI Channel #15</option>
+                                                    <option value="20">MIDI Channel #16</option>
+                                                </select>
+                                            </label>
+                                            <label>Function Detail
+                                                <select class="form-control switchFunctionDetail">
+                                                </select>
+                                            </label>
+                                            <label>Transmit CC
+                                                <select class="form-control transmitCC">
+                                                    <option value="0">No</option>
+                                                    <option value="1">Yes</option>
+                                                </select>
+                                            </label>
+                                            <label>Switch Type
+                                                <select class="form-control switchType">
+                                                    <option value="0">Latching</option>
+                                                    <option value="1">Momentary</option>
+                                                </select>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div role="tabpanel" class="tab-pane" id="utility">
 
                                     </div>
                                 </div>

@@ -194,6 +194,8 @@ var Config = function () {
     this.softOptions = new SoftOptions();
     this.directorySpeed = 0x02;
     this.programChangeReceiveChannel = 0x01;
+
+    // Instant Access Buttons
     this.switchFunctions = [];
     this.switchFunctionDetails = [];
     this.switchTransmitCC = [];
@@ -213,10 +215,10 @@ var Config = function () {
     this.LENGTHS.softOptions = 1;
     this.LENGTHS.directorySpeed = 1;
     this.LENGTHS.programChangeReceiveChannel = 1;
-    this.LENGTHS.switchFunctions = NUM_GCX_SWITCHES;
-    this.LENGTHS.switchFunctionDetails = NUM_GCX_SWITCHES;
-    this.LENGTHS.switchTransmitCC = NUM_GCX_SWITCHES;
-    this.LENGTHS.switchType = NUM_GCX_SWITCHES;
+    this.LENGTHS.switchFunctions = NUM_INSTANT_ACCESS;
+    this.LENGTHS.switchFunctionDetails = NUM_INSTANT_ACCESS;
+    this.LENGTHS.switchTransmitCC = NUM_INSTANT_ACCESS;
+    this.LENGTHS.switchType = NUM_INSTANT_ACCESS;
 
     this.OFFSETS = {};
 
@@ -242,7 +244,7 @@ var Config = function () {
         this.gcxSwitchTypes[i] = 0;
     }
 
-    for(i = 0; i < NUM_GCX_SWITCHES; i++){
+    for(i = 0; i < NUM_INSTANT_ACCESS; i++){
         this.switchFunctions[i] = 0;
         this.switchFunctionDetails[i] = i;
         this.switchTransmitCC[i] = 0;

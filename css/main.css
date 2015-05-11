@@ -71,3 +71,9 @@
 .ui-dialog-titlebar-close {
   visibility: hidden;
 }
+
+.gcxSwitchType {
+    width: 20%;
+    display: inline-block;
+    margin-left: 8px;
+}
