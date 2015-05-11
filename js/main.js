@@ -277,7 +277,7 @@ function renderPreset(){
 
     $base.find("#presetPanel .preset").each(function(){
         var $p = $(this);
-        var pNum = $p.attr('data-preset');
+        var pNum = +$p.attr('data-preset');
 
         var sync = function(){
             $p.find('.presetName').val(gcp.presets[pNum].name);
@@ -322,6 +322,71 @@ function renderPreset(){
             );
         }).focusin(function(){
             $(this).val($(this).val().replace(/\s+$/g, ""));
+        });
+
+        $(document).on('config:pedalExists:change', function(event, data){
+            if(gcp.config.pedalsExist[0] == 1 || gcp.config.pedalsExist[1] == 1) {
+                $p.find('.presetPedals button').show();
+            } else {
+                $p.find('.presetPedals button').hide();
+            }
+        });
+
+        $(document).on('config:numGCX:change', function(event, data){
+            if(gcp.config.numGCX > 0){
+                $p.find('.loopStates button').show();
+            } else {
+                $p.find('.loopStates button').hide();
+            }
+        });
+
+        $p.find('.presetPedals button').click(function(){
+
+        });
+
+        $p.find('.loopStates button').click(function(){
+
+        });
+
+        $p.find('.iaStates button').click(function(){
+            var $dialog = $('<div/>').appendTo($('body'));
+
+            var buildIa = function(ia){
+                var $wrapper = $('<div class="form-group"></div>').appendTo($dialog);
+                var $label = $(sprintf('<label>Instant Access %d State </label>', ia+1)).appendTo($wrapper);
+                var $sel = $(sprintf('<select class="form-control" data-ia="%d"><option value="0">Off</option><option value="1">On</option></select>', ia)).appendTo($label);
+
+                $sel.change(function(){
+                    gcp.presets[pNum].instantAccessState[ia] = +$(this).val();
+                }).val(gcp.presets[pNum].instantAccessState[ia]);
+            };
+
+            for(var i = 0; i < NUM_INSTANT_ACCESS; i++){
+                buildIa(i);
+            }
+
+            $dialog.dialog({
+                title: sprintf('Preset %d Instant Access States', pNum),
+                autoOpen: true,
+                closeOnEscape: true,
+                width: 500,
+                height: 400,
+                buttons: [
+                    {
+                        text: "Close",
+                        click: function(){
+
+                            $dialog.dialog('close');
+
+                        }
+                    }
+                ]
+            });
+
+            $dialog.on('dialogclose', function(e){
+                $dialog.remove();
+            });
+
         });
 
         sync();
@@ -381,6 +446,7 @@ function renderConfig(){
     $base.find('.pedal').change(function(){
         var p = +$(this).attr('data-pedal');
         gcp.config.pedalsExist[p] = +$(this).val();
+        $(document).trigger("config:pedalExists:change", [{pedal: p, exists: +$(this).val()}]);
     }).each(function(){
         var p = +$(this).attr('data-pedal');
         $(this).val(gcp.config.pedalsExist[p]);
@@ -408,6 +474,8 @@ function renderConfig(){
                 }).val(gcp.config.gcxSwitchTypes[i*NUM_GCX_SWITCHES+j]);
             }
         }
+
+        $(document).trigger('config:numGCX:change', [{numGCX: +$(this).val()}]);
 
 
     }).val(gcp.config.numGCX);

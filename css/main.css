@@ -77,3 +77,15 @@
     display: inline-block;
     margin-left: 8px;
 }
+
+.presetPedals, .loopStates, .iaStates {
+    display: inline;
+}
+
+.presetPedals button {
+    display: none;
+}
+
+.loopStates button {
+    display: none;
+}
