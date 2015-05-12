@@ -279,6 +279,29 @@ function renderPreset(){
         var $p = $(this);
         var pNum = +$p.attr('data-preset');
 
+        var syncDev = function(d, $changes){
+            var $d = $(sprintf('<div class="checkbox"><label><input type="checkbox" class="preset_device_enabled" data-device="%d"> <span class="preset_device_enabled_title">%s</span></label></div>', d, gcp.config.deviceNames[d])).appendTo($changes);
+
+            $d.find('input').prop('checked', gcp.presets[pNum].deviceProgramChanges[d].onOff != 0);
+
+            var $input = $(sprintf('<input type="text" class="preset_device_change form-control" data-device="%d" size="3"/>', d)).appendTo($changes);
+
+            $input.val(gcp.presets[pNum].deviceProgramChanges[d].pc);
+
+            $d.find('.preset_device_enabled').click(function(){
+                var dNum = $(this).attr('data-device');
+                if($(this).prop('checked')){
+                    gcp.presets[pNum].deviceProgramChanges[dNum].onOff = 1;
+                } else {
+                    gcp.presets[pNum].deviceProgramChanges[dNum].onOff = 0;
+                }
+            });
+
+            $input.blur(function(){
+                gcp.presets[pNum].deviceProgramChanges[d].pc = +$(this).val();
+            });
+        };
+
         var sync = function(){
             $p.find('.presetName').val(gcp.presets[pNum].name);
 
@@ -288,28 +311,13 @@ function renderPreset(){
 
             for(var i = 0; i < NUM_DEVICES; i++){
                 if(gcp.config.isDeviceEnabled(i)){
-                    var $d = $(sprintf('<div class="checkbox"><label><input type="checkbox" class="preset_device_enabled" data-device="%d"> <span class="preset_device_enabled_title">%s</span></label></div>', i, gcp.config.deviceNames[i])).appendTo($changes);
-
-                    $d.find('input').prop('checked', gcp.presets[pNum].deviceProgramChanges[i].onOff != 0);
-
-                    var $input = $(sprintf('<input type="text" class="preset_device_change form-control" data-device="%d" size="3"/>', i)).appendTo($changes);
-
-                    $input.val(gcp.presets[pNum].deviceProgramChanges[i].pc);
+                    syncDev(i, $changes);
                 }
             }
         };
 
         $(document).on('config:deviceName:change config:deviceEnabled:change presets:copy presets:import', function(event, data){
             sync();
-        });
-
-        $p.find('.preset_device_enabled').click(function(){
-            var dNum = $(this).attr('data-device');
-            if($(this).prop('checked')){
-                gcp.presets[pNum].deviceProgramChanges[dNum].onOff = 1;
-            } else {
-                gcp.presets[pNum].deviceProgramChanges[dNum].onOff = 0;
-            }
         });
 
         $p.find('.presetName').blur(function(){
@@ -582,14 +590,18 @@ function renderConfig(){
         var $wrapper = $('.gcxSwitchTypes');
         $wrapper.html("");
 
+        var buildSwitch = function(i, j){
+            var $label = $(sprintf('<label>Switch %d</label>', j+1)).appendTo($sw);
+            var $sel = $('<select class="form-control"><option value="0">Latching</option><option value="1">Momentary</option></select>').appendTo($label);
+            $sel.change(function(){
+                gcp.config.gcxSwitchTypes[i*NUM_GCX_SWITCHES+j] = +$(this).val();
+            }).val(gcp.config.gcxSwitchTypes[i*NUM_GCX_SWITCHES+j]);
+        };
+
         for(var i = 0; i < gcp.config.numGCX; i++){
             var $sw = $(sprintf('<div class="gcxSwitchType" data-gcx="%d"><h4>GCX %d<h4></h4></div>', i, i+1)).appendTo($wrapper);
             for(var j = 0; j < NUM_GCX_SWITCHES; j++){
-                var $label = $(sprintf('<label>Switch %d</label>', j+1)).appendTo($sw);
-                var $sel = $('<select class="form-control"><option value="0">Latching</option><option value="1">Momentary</option></select>').appendTo($label);
-                $sel.change(function(){
-                    gcp.config.gcxSwitchTypes[i*NUM_GCX_SWITCHES+j] = +$(this).val();
-                }).val(gcp.config.gcxSwitchTypes[i*NUM_GCX_SWITCHES+j]);
+                buildSwitch(i, j);
             }
         }
 
