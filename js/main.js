@@ -355,7 +355,7 @@ function renderPreset(){
             }
         });
 
-        $p.find('.presetPedals button').click(function(){
+        $p.find('.presetPedals button').unbind('click').click(function(){
             var $dialog = $('<div/>').appendTo($('body'));
 
             var buildPC = function(p){
@@ -424,7 +424,7 @@ function renderPreset(){
             });
         });
 
-        $p.find('.loopStates button').click(function(){
+        $p.find('.loopStates button').unbind('click').click(function(){
             var $dialog = $('<div/>').appendTo($('body'));
 
             var buildLS = function(ls, $w, gcx){
@@ -481,7 +481,7 @@ function renderPreset(){
             });
         });
 
-        $p.find('.iaStates button').click(function(){
+        $p.find('.iaStates button').unbind('click').click(function(){
             var $dialog = $('<div/>').appendTo($('body'));
 
             var buildIa = function(ia){
