@@ -332,6 +332,13 @@ function renderPreset(){
             $(this).val($(this).val().replace(/\s+$/g, ""));
         });
 
+        if(gcp.config.pedalsExist[0] == 1 || gcp.config.pedalsExist[1] == 1){
+            $p.find('.presetPedals button').show();
+        }
+        if(gcp.config.numGCX > 0){
+            $p.find('.loopStates button').show();
+        }
+
         $(document).on('config:pedalExists:change', function(event, data){
             if(gcp.config.pedalsExist[0] == 1 || gcp.config.pedalsExist[1] == 1) {
                 $p.find('.presetPedals button').show();
