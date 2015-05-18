@@ -427,43 +427,70 @@ function renderPreset(){
         $p.find('.loopStates button').unbind('click').click(function(){
             var $dialog = $('<div/>').appendTo($('body'));
 
-            var buildLS = function(ls, $w, gcx){
-                var $wrapper = $('<div class="form-group"></div>').appendTo($w);
-                var $label = $(sprintf('<label>GCX %d Loop %d State </label>', gcx+1, ls+1)).appendTo($wrapper);
-                var $sel = $('<select class="form-control"><option value="0">Off</option><option value="1">On</option></select>').appendTo($label);
+            var $table = $('<table/>').appendTo($dialog);
 
-                $sel.change(function(){
-                    gcp.presets[pNum].gcxLoopStates[gcx*NUM_GCX_LOOPS+ls] = +$(this).val();
-                }).val(gcp.presets[pNum].gcxLoopStates[gcx*NUM_GCX_LOOPS+ls]);
-            };
-
-            var buildGCX = function(gcx){
-                var $gcxWrapper = $('<div class="gcxLoopState"/>').appendTo($dialog);
-                $(sprintf('<h4>GCX %d</h4>', gcx+1)).appendTo($gcxWrapper);
-                var $wrapper = $('<div class="form-group"></div>').appendTo($gcxWrapper);
-
-                var $label = $('<label>Send GCX Data </label>').appendTo($wrapper);
-                var $sel = $('<select class="form-control"><option value="0">Yes</option><option value="1">No</option></select>').appendTo($label);
-
-                $sel.change(function(){
-                    gcp.presets[pNum].gcxToggles[gcx] = +$(this).val();
-                }).val(gcp.presets[pNum].gcxToggles[gcx]);
-
-                for(var i = 0; i < NUM_GCX_LOOPS; i++){
-                    buildLS(i, $gcxWrapper, gcx);
-                }
-            };
-
+            var columns = [{title: '&nbsp;'}];
             for(var i = 0; i < gcp.config.numGCX; i++){
-                buildGCX(i);
+                columns.push({title: sprintf('GCX %d', i+1)});
             }
 
+            var dt = $table.DataTable({
+                paging: false,
+                info: false,
+                searching: false,
+                ordering: false,
+                scrollY: "100%",
+                columns: columns
+            });
+
+            var row = [];
+
+            // Send Data
+            row.push("Send GCX Data");
+            for(var i = 0; i < gcp.config.numGCX; i++){
+                row.push(sprintf('<select class="form-control sendGCX" data-gcx="%d"><option value="0">Yes</option><option value="1">No</option></select>', i));
+            }
+
+            dt.row.add(row);
+
+            for(var i = 0; i < NUM_GCX_LOOPS; i++){
+                row = [sprintf('Loop %d State', i+1)];
+                for(var j = 0; j < gcp.config.numGCX; j++){
+                    row.push(sprintf('<select class="form-control loopState" data-loop="%d" data-gcx="%d"><option value="0">Off</option><option value="1">On</option></select>', i, j));
+                }
+                dt.row.add(row);
+            }
+
+            dt.draw();
+
+            $dialog.on('dialogopen dialogresize', function(e){
+                dt.columns.adjust().draw();
+            });
+
+            $table.find('.sendGCX').each(function(){
+                var gcx = +$(this).attr('data-gcx');
+                $(this).val(gcp.presets[pNum].gcxToggles[gcx]);
+            }).change(function(){
+                var gcx = +$(this).attr('data-gcx');
+                gcp.presets[pNum].gcxToggles[gcx] = +$(this).val();
+            });
+
+            $table.find('.loopState').each(function(){
+                var gcx = +$(this).attr('data-gcx');
+                var ls = +$(this).attr('data-loop');
+                $(this).val(gcp.presets[pNum].gcxLoopStates[gcx*NUM_GCX_LOOPS+ls]);
+            }).change(function(){
+                var gcx = +$(this).attr('data-gcx');
+                var ls = +$(this).attr('data-loop');
+                gcp.presets[pNum].gcxLoopStates[gcx*NUM_GCX_LOOPS+ls] = +$(this).val();
+            });
+
             $dialog.dialog({
-                title: sprintf('Preset %d GCX Loop Configuration', pNum),
+                title: sprintf('Preset %d GCX Loop States', pNum),
                 autoOpen: true,
                 closeOnEscape: true,
                 width: 500,
-                height: 400,
+                height: 650,
                 buttons: [
                     {
                         text: "Close",
