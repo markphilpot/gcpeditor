@@ -457,7 +457,7 @@ function renderPreset(){
             // Send Data
             row.push("Send GCX Data");
             for(var i = 0; i < gcp.config.numGCX; i++){
-                row.push(sprintf('<select class="form-control sendGCX" data-gcx="%d"><option value="0">Yes</option><option value="1">No</option></select>', i));
+                row.push(sprintf('<input type="checkbox" class="sendGCX" data-gcx="%d" data-size="mini">', i));
             }
 
             dt.row.add(row);
@@ -465,7 +465,7 @@ function renderPreset(){
             for(var i = 0; i < NUM_GCX_LOOPS; i++){
                 row = [sprintf('Loop %d State', i+1)];
                 for(var j = 0; j < gcp.config.numGCX; j++){
-                    row.push(sprintf('<select class="form-control loopState" data-loop="%d" data-gcx="%d"><option value="0">Off</option><option value="1">On</option></select>', i, j));
+                    row.push(sprintf('<input type="checkbox" class="loopState" data-loop="%d" data-gcx="%d" data-size="mini">', i, j));
                 }
                 dt.row.add(row);
             }
@@ -476,22 +476,28 @@ function renderPreset(){
                 dt.columns.adjust().draw();
             });
 
-            $table.find('.sendGCX').each(function(){
+            $table.find('.sendGCX').bootstrapSwitch({
+                onText: "Yes",
+                offText: "No"
+            }).each(function(){
                 var gcx = +$(this).attr('data-gcx');
-                $(this).val(gcp.presets[pNum].gcxToggles[gcx]);
-            }).change(function(){
+                $(this).bootstrapSwitch('state', gcp.presets[pNum].gcxToggles[gcx] == 0);
+            }).on('switchChange.bootstrapSwitch', function(event, state){
                 var gcx = +$(this).attr('data-gcx');
-                gcp.presets[pNum].gcxToggles[gcx] = +$(this).val();
+                gcp.presets[pNum].gcxToggles[gcx] = state ? 0 : 1;
             });
 
-            $table.find('.loopState').each(function(){
+            $table.find('.loopState').bootstrapSwitch({
+                onText: "On",
+                offText: "Off"
+            }).each(function(){
                 var gcx = +$(this).attr('data-gcx');
                 var ls = +$(this).attr('data-loop');
-                $(this).val(gcp.presets[pNum].gcxLoopStates[gcx*NUM_GCX_LOOPS+ls]);
-            }).change(function(){
+                $(this).bootstrapSwitch('state', gcp.presets[pNum].gcxLoopStates[gcx*NUM_GCX_LOOPS+ls] == 1);
+            }).on('switchChange.bootstrapSwitch', function(event, state){
                 var gcx = +$(this).attr('data-gcx');
                 var ls = +$(this).attr('data-loop');
-                gcp.presets[pNum].gcxLoopStates[gcx*NUM_GCX_LOOPS+ls] = +$(this).val();
+                gcp.presets[pNum].gcxLoopStates[gcx*NUM_GCX_LOOPS+ls] = state ? 1 : 0;
             });
 
             $dialog.dialog({
@@ -499,7 +505,7 @@ function renderPreset(){
                 autoOpen: true,
                 closeOnEscape: true,
                 width: 500,
-                height: 650,
+                height: 550,
                 buttons: [
                     {
                         text: "Close",
@@ -523,11 +529,14 @@ function renderPreset(){
             var buildIa = function(ia){
                 var $wrapper = $('<div class="form-group"></div>').appendTo($dialog);
                 var $label = $(sprintf('<label>Instant Access %d State </label>', ia+1)).appendTo($wrapper);
-                var $sel = $(sprintf('<select class="form-control" data-ia="%d"><option value="0">Off</option><option value="1">On</option></select>', ia)).appendTo($label);
+                var $toggle = $(sprintf('<input type="checkbox" data-ia="%d" data-size="mini">', ia)).appendTo($label);
 
-                $sel.change(function(){
-                    gcp.presets[pNum].instantAccessState[ia] = +$(this).val();
-                }).val(gcp.presets[pNum].instantAccessState[ia]);
+                $toggle.bootstrapSwitch({
+                    onText: "On",
+                    offText: "Off"
+                }).on('switchChange.bootstrapSwitch', function(event, state){
+                    gcp.presets[pNum].instantAccessState[ia] = state ? 1 : 0;
+                }).bootstrapSwitch('state', gcp.presets[pNum].instantAccessState[ia] == 1);
             };
 
             for(var i = 0; i < NUM_INSTANT_ACCESS; i++){
@@ -535,11 +544,11 @@ function renderPreset(){
             }
 
             $dialog.dialog({
-                title: sprintf('Preset %d Instant Access States', pNum),
+                title: sprintf('Preset %d Instant Access', pNum),
                 autoOpen: true,
                 closeOnEscape: true,
-                width: 500,
-                height: 400,
+                width: 350,
+                height: 460,
                 buttons: [
                     {
                         text: "Close",
@@ -613,20 +622,24 @@ function renderConfig(){
         });
     });
 
-    $base.find('.pedal').change(function(){
+    $base.find('.pedal').bootstrapSwitch({
+        onText: "Yes",
+        offText: "No"
+    }).on('switchChange.bootstrapSwitch', function(event, state){
         var p = +$(this).attr('data-pedal');
-        gcp.config.pedalsExist[p] = +$(this).val();
-        $(document).trigger("config:pedalExists:change", [{pedal: p, exists: +$(this).val()}]);
+        gcp.config.pedalsExist[p] = state ? 1 : 0;
+        $(document).trigger("config:pedalExists:change", [{pedal: p, exists: state ? 1 : 0}]);
     }).each(function(){
         var p = +$(this).attr('data-pedal');
-        $(this).val(gcp.config.pedalsExist[p]);
+        $(this).bootstrapSwitch('state', gcp.config.pedalsExist[p] == 1);
     });
 
-    $base.find('.vca').change(function(){
-        gcp.config.vcaExists = +$(this).val();
-    }).each(function(){
-        $(this).val(gcp.config.vcaExists);
-    });
+    $base.find('.vca').bootstrapSwitch({
+        onText: "Yes",
+        offText: "No"
+    }).on('switchChange.bootstrapSwitch', function(event, state){
+        gcp.config.vcaExists = state ? 1 : 0;
+    }).bootstrapSwitch('state', gcp.config.vcaExists == 1);
 
     $base.find('.numGCX').change(function(){
         gcp.config.numGCX = +$(this).val();
@@ -636,10 +649,13 @@ function renderConfig(){
 
         var buildSwitch = function(i, j){
             var $label = $(sprintf('<label>Switch %d</label>', j+1)).appendTo($sw);
-            var $sel = $('<select class="form-control"><option value="0">Latching</option><option value="1">Momentary</option></select>').appendTo($label);
-            $sel.change(function(){
-                gcp.config.gcxSwitchTypes[i*NUM_GCX_SWITCHES+j] = +$(this).val();
-            }).val(gcp.config.gcxSwitchTypes[i*NUM_GCX_SWITCHES+j]);
+            var $toggle = $('<input type="checkbox" data-size="mini">').appendTo($label);
+            $toggle.bootstrapSwitch({
+                onText: "Latching",
+                offText: "Momentary"
+            }).on('switchChange.bootstrapSwitch', function(event, state){
+                gcp.config.gcxSwitchTypes[i*NUM_GCX_SWITCHES+j] = state ? 0 : 1;
+            }).bootstrapSwitch('state', gcp.config.gcxSwitchTypes[i*NUM_GCX_SWITCHES+j] == 0);
         };
 
         for(var i = 0; i < gcp.config.numGCX; i++){

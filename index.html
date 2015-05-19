@@ -16,6 +16,7 @@
         <link rel="stylesheet" href="bower_components/jgrowl/jquery.jgrowl.min.css">
         <link rel="stylesheet" href="bower_components/DataTables/media/css/jquery.dataTables.min.css">
         <link rel="stylesheet" href="bower_components/datatables-bootstrap3/BS3/assets/css/datatables.css">
+        <link rel="stylesheet" href="bower_components/bootstrap-switch/dist/css/bootstrap3/bootstrap-switch.min.css">
 
         <link href='http://fonts.googleapis.com/css?family=Archivo+Black' rel='stylesheet' type='text/css'>
         <link href='http://fonts.googleapis.com/css?family=Dancing+Script' rel='stylesheet' type='text/css'>
@@ -105,13 +106,13 @@
                                     </div>
                                     <div role="tabpanel" class="tab-pane" id="pedals">
                                         <div class="form-group">
-                                            <label>Pedal 1 <select class="form-control pedal" data-pedal="0"><option value="0">No</option><option value="1">Yes</option></select></label>
+                                            <label>Pedal 1 <input type="checkbox" class="pedal" data-pedal="0" data-size="mini"></label>
                                         </div>
                                         <div class="form-group">
-                                            <label>Pedal 2 <select class="form-control pedal" data-pedal="1"><option value="0">No</option><option value="1">Yes</option></select></label>
+                                            <label>Pedal 2 <input type="checkbox" class="pedal" data-pedal="1" data-size="mini"></label>
                                         </div>
                                         <div class="form-group">
-                                            <label>VCA <select class="form-control vca"><option value="0">No</option><option value="1">Yes</option></select></label>
+                                            <label>VCA <input type="checkbox" class="vca" data-pedal="0" data-size="mini"></label>
                                         </div>
                                     </div>
                                     <div role="tabpanel" class="tab-pane" id="expanders">
@@ -337,6 +338,7 @@
         <script src="bower_components/jgrowl/jquery.jgrowl.min.js"></script>
         <script src="bower_components/DataTables/media/js/jquery.dataTables.min.js"></script>
         <script src="bower_components/datatables-bootstrap3/BS3/assets/js/datatables.js"></script>
+        <script src="bower_components/bootstrap-switch/dist/js/bootstrap-switch.min.js"></script>
 
         <script src="js/gcp.js"></script>
         <script src="js/main.js"></script>
