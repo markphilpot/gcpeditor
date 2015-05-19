@@ -286,7 +286,7 @@ function renderPreset(){
 
             var $input = $(sprintf('<input type="text" class="preset_device_change form-control" data-device="%d" size="3"/>', d)).appendTo($changes);
 
-            $input.val(gcp.presets[pNum].deviceProgramChanges[d].pc);
+            $input.val(gcp.config.deviceProgramOffsets[d] == 0 ? gcp.presets[pNum].deviceProgramChanges[d].pc + 1 : gcp.presets[pNum].deviceProgramChanges[d].pc);
 
             $d.find('.preset_device_enabled').click(function(){
                 var dNum = $(this).attr('data-device');
@@ -298,7 +298,16 @@ function renderPreset(){
             });
 
             $input.blur(function(){
-                gcp.presets[pNum].deviceProgramChanges[d].pc = +$(this).val();
+                var newVal = gcp.config.deviceProgramOffsets[d] == 0 ? +$(this).val()-1 : +$(this).val();
+
+                if(gcp.config.deviceProgramOffsets[d] == 0 && newVal < 0){
+                    $.jGrowl("Device Program Change out of range");
+                    $(this).val(gcp.presets[pNum].deviceProgramChanges[d].pc + 1);
+                }
+
+                // TODO add more range checking
+
+                gcp.presets[pNum].deviceProgramChanges[d].pc = newVal;
             });
         };
 
@@ -572,6 +581,7 @@ function renderConfig(){
             $d.find('fieldset').attr('disabled', 'disabled');
         } else {
             $d.find('.device_enabled').prop('checked', true);
+            $d.find('fieldset').removeAttr('disabled');
         }
 
         sync();
