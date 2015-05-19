@@ -80,8 +80,9 @@ var Preset = function(){
     for(i = 0; i < NUM_DEVICES; i++){
         this.deviceProgramChanges[i] = new DeviceProgramChange();
     }
+    var pedalInit = [0x0A, 0x13]; // initial values from GCP init
     for(i = 0; i < NUM_PEDALS; i++){
-        this.pedalDefinitions[i] = 0;
+        this.pedalDefinitions[i] = pedalInit[i];
         this.pedalDeviceAssignments[i] = 1;
     }
     for(i = 0; i < NUM_GCX * NUM_GCX_LOOPS; i++ ){
@@ -397,6 +398,14 @@ var GcpSyxEx = function(){
 
     for(var i = 0; i < NUM_PRESETS; i++){
         this.presets[i] = new Preset();
+
+        // init so it matches the GCP init state
+        if(i != 0 && i != 128){
+            for(var j = 0; j < NUM_DEVICES-1; j++) {
+                this.presets[i].deviceProgramChanges[j].onOff = 1;
+                this.presets[i].deviceProgramChanges[j].pc = (i%128) - 1;
+            }
+        }
     }
 };
 
