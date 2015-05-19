@@ -690,11 +690,25 @@ function renderConfig(){
                     gcp.config.switchFunctionDetails[btnNum] = 0;
                 }
 
+                $btn.find('.switchFunctionDetail').parent().show();
+                $btn.find('.transmitCC').parent().hide();
+                $btn.find('.switchType').parent().hide();
+
+            } else if(gcp.config.switchFunctions[btnNum] == 4) {
+                // Seq start/stop
+                $btn.find('.switchFunctionDetail').parent().hide();
+                $btn.find('.transmitCC').parent().hide();
+                $btn.find('.switchType').parent().hide();
+
             } else {
                 // MIDI Controller #
                 for (var i = 0; i < 121; i++) {
                     $(sprintf('<option value="%d">MIDI Controller #%d</option>', i, i + 1)).appendTo($detailSel);
                 }
+
+                $btn.find('.switchFunctionDetail').parent().hide();
+                $btn.find('.transmitCC').parent().show();
+                $btn.find('.switchType').parent().show();
             }
 
             $detailSel.val(gcp.config.switchFunctionDetails[btnNum]);
