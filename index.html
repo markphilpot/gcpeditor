@@ -55,6 +55,9 @@
                                         <a href="#expanders" aria-controls="expanders" role="tab" data-toggle="tab">Expanders</a>
                                     </li>
                                     <li role="presentation">
+                                        <a href="#midi" aria-controls="midi" role="tab" data-toggle="tab">MIDI</a>
+                                    </li>
+                                    <li role="presentation">
                                         <a href="#instant" aria-controls="instant" role="tab" data-toggle="tab">Instant Access</a>
                                     </li>
                                     <li role="presentation">
@@ -191,6 +194,17 @@
                                                 </select>
                                             </label>
                                         </div>
+                                        <div class="form-group">
+                                            <label>Global Program
+                                                <select class="form-control softOptions_global">
+                                                    <option value="0">Off</option>
+                                                    <option value="1">On</option>
+                                                </select>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div role="tabpanel" class="tab-pane" id="midi">
                                         <div class="checkbox">
                                             <label>
                                                 <input type="checkbox" class="softOptions_respond"/> Respond to Program Change
@@ -215,14 +229,6 @@
                                                     <option value="13">14</option>
                                                     <option value="14">15</option>
                                                     <option value="15">16</option>
-                                                </select>
-                                            </label>
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Global Program
-                                                <select class="form-control softOptions_global">
-                                                    <option value="0">Off</option>
-                                                    <option value="1">On</option>
                                                 </select>
                                             </label>
                                         </div>
