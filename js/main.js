@@ -745,23 +745,20 @@ function renderConfig(){
                 }
 
                 $btn.find('.switchFunctionDetail').parent().show();
-                $btn.find('.transmitCC').parent().hide();
                 $btn.find('.switchType').parent().hide();
 
             } else if(gcp.config.switchFunctions[btnNum] == 4) {
                 // Seq start/stop
                 $btn.find('.switchFunctionDetail').parent().hide();
-                $btn.find('.transmitCC').parent().hide();
                 $btn.find('.switchType').parent().hide();
 
             } else {
                 // MIDI Controller #
                 for (var i = 0; i < 121; i++) {
-                    $(sprintf('<option value="%d">MIDI Controller #%d</option>', i, i + 1)).appendTo($detailSel);
+                    $(sprintf('<option value="%d">MIDI Controller #%d</option>', i, i)).appendTo($detailSel);
                 }
 
                 $btn.find('.switchFunctionDetail').parent().show();
-                $btn.find('.transmitCC').parent().show();
                 $btn.find('.switchType').parent().show();
             }
 
@@ -779,13 +776,25 @@ function renderConfig(){
             gcp.config.switchFunctionDetails[btnNum] = +$(this).val();
         }).val(gcp.config.switchFunctionDetails[btnNum]);
 
-        $btn.find('.transmitCC').change(function(){
-            gcp.config.switchTransmitCC[btnNum] = +$(this).val();
-        }).val(gcp.config.switchTransmitCC[btnNum]);
-
         $btn.find('.switchType').change(function(){
-            gcp.config.switchType[btnNum] = +$(this).val();
-        }).val(gcp.config.switchType[btnNum]);
+            var v = +$(this).val();
+
+            if(v == 0 || v == 1){
+                // Latch or Momentary
+                gcp.config.switchType[btnNum] = v;
+                gcp.config.switchTransmitCC[btnNum] = 0;
+            } else {
+                // transmit CC
+                gcp.config.switchType[btnNum] = 0;
+                gcp.config.switchTransmitCC[btnNum] = 1;
+            }
+        }).each(function(){
+            if(gcp.config.switchTransmitCC[btnNum] == 1){
+                $(this).val(2);
+            } else {
+                $(this).val(gcp.config.switchType[btnNum])
+            }
+        });
     });
 
     $base.find('.programAccessMode').change(function(){
