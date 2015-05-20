@@ -760,7 +760,7 @@ function renderConfig(){
                     $(sprintf('<option value="%d">MIDI Controller #%d</option>', i, i + 1)).appendTo($detailSel);
                 }
 
-                $btn.find('.switchFunctionDetail').parent().hide();
+                $btn.find('.switchFunctionDetail').parent().show();
                 $btn.find('.transmitCC').parent().show();
                 $btn.find('.switchType').parent().show();
             }
