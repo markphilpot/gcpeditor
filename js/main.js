@@ -45,56 +45,19 @@ $(function(){
 
     $('#copy-presets').click(function(){
 
+        var dt = $("#preset_table").DataTable();
+
         if($(this).attr('data-next') == 'done') {
             $(this).attr('data-next', 'copy');
             $(this).html("Done");
 
-            $('#presetPanel .preset').each(function () {
-                var $p = $(this);
-                var pNum = $p.attr('data-preset');
+            dt.column(5).visible(true);
 
-                var $cp = $('<button class="copy-p btn btn-default" type="button">Copy..</button>').appendTo($p.find('form'));
-
-                $cp.click(function(){
-                    bootbox.prompt({
-                        title: sprintf("Copy preset %d to target (overwrite)", pNum),
-                        callback: function(result){
-
-
-                            if(result === null){
-                                // Dismiss
-                            } else {
-                                var t = parseInt(result, 10);
-
-                                if(t < 0 || t > 199){
-                                    $.jGrowl(sprintf("Invalid target preset (%d)", t));
-                                    return;
-                                }
-
-                                // Perform copy
-                                var src = gcp.presets[pNum];
-
-                                var target = gcp.presets[t];
-
-                                var b = src.compile();
-                                var ab = new DataView(new ArrayBuffer(PRESET_NUM_BYTES));
-
-                                for(var i = 0; i < b.length; i++){
-                                    ab.setUint8(i, b[i]);
-                                }
-
-                                target.init(ab.buffer);
-
-                                $(document).trigger('presets:copy', [{src: pNum, target: t}]);
-                            }
-                        }
-                    })
-                });
-            });
         } else {
             $(this).attr('data-next', 'done');
             $(this).html("Copy Presets");
-            $('.copy-p').remove();
+
+            dt.column(5).visible(false);
         }
 
     });
@@ -238,32 +201,89 @@ function init(){
         $clone.find('label span').html(i+1);
     }
 
-    var $bankList = $base.find('#presetPanel .tab-content');
-    var $bankNav = $base.find('#presetPanel .nav-tabs');
+    //jQuery.fn.dataTableExt.oPagination.iFullNumbersShowPages = 20;
 
-    var $preset = $base.find('#presetPanel .preset');
+    var dt = $('#preset_table').DataTable({
+        //paging: false,
+        lengthMenu: [4, 8, 10, 12, 25, 50, 100],
+        pageLength: 10,
+        info: false,
+        //pagingType: 'full_numbers',
+        //searching: false,
+        //ordering: false,
+        scrollY: "100%",
+        columns: [
+            {title: 'pNum', visible: false},
+            {title: 'Preset', width: '20px'},
+            {title: 'Name', width: '100px'},
+            {title: 'Devices'},
+            {title: 'Settings'},
+            {title: 'Copy'}
+        ]
+    });
 
-    var banks = [];
-    var bankLabels = "0123456789ABCDEFGHIJ";
-    for(var i = 0; i < NUM_BANKS; i++ ){
-        if(i != 0){
-            $(sprintf('<li role="presentation"><a href="#bank%d" aria-controls="presets" role="tab" data-toggle="tab">%s</a></li>', i, bankLabels[i])).appendTo($bankNav);
-            $(sprintf('<div role="tabpanel" class="tab-pane" id="bank%d"></div>', i)).appendTo($bankList);
-        }
-
-        banks[i] = $(sprintf('#bank%d', i));
-    }
+    var bank10Labels = "0123456789ABCDEFGHIJ";
 
     for(var i = 0; i < NUM_PRESETS; i++){
-        if(i == 0){
-            continue;
-        }
-
-        var $clone = $preset.clone().appendTo(banks[Math.floor(i/10)]);
-
-        $clone.attr('data-preset', i);
-        $clone.find('.preset-label-num').html(i);
+        dt.row.add([
+            i,
+            sprintf("%s%d", bank10Labels[Math.floor(i/10)], i%10),
+            '<input type="text" class="form-control presetName" size="11" maxlength="10">',
+            '<div class="deviceProgramChanges form-group"/>',
+            '<button type="button" class="btn btn-default btn-xs presetPedals">Pedals</button> <button type="button" class="btn btn-default btn-xs loopStates">Loop States</button> <button type="button" class="btn btn-default btn-xs iaStates">Instant Access</button>',
+            '<button class="copy-p btn btn-default btn-xs" type="button">Copy..</button>'
+        ]);
     }
+
+    dt.draw();
+
+    $('#presetPanel').on('shown.bs.collapse', function(){
+        dt.columns.adjust().draw();
+    });
+
+    dt.rows().every(function(){
+
+        var $p = $(this.node());
+        var pNum = +this.data()[0];
+
+        $p.find('.copy-p').click(function(){
+            bootbox.prompt({
+                title: sprintf("Copy preset %d to target (overwrite)", pNum),
+                callback: function(result){
+
+
+                    if(result === null){
+                        // Dismiss
+                    } else {
+                        var t = parseInt(result, 10);
+
+                        if(t < 0 || t > 199){
+                            $.jGrowl(sprintf("Invalid target preset (%d)", t));
+                            return;
+                        }
+
+                        // Perform copy
+                        var src = gcp.presets[pNum];
+
+                        var target = gcp.presets[t];
+
+                        var b = src.compile();
+                        var ab = new DataView(new ArrayBuffer(PRESET_NUM_BYTES));
+
+                        for(var i = 0; i < b.length; i++){
+                            ab.setUint8(i, b[i]);
+                        }
+
+                        target.init(ab.buffer);
+
+                        $(document).trigger('presets:copy', [{src: pNum, target: t}]);
+                    }
+                }
+            })
+        });
+    });
+
+    dt.column(5).visible(false);
 }
 
 function render(){
@@ -275,9 +295,36 @@ function renderPreset(){
 
     var $base = $('#gcp');
 
-    $base.find("#presetPanel .preset").each(function(){
-        var $p = $(this);
-        var pNum = +$p.attr('data-preset');
+    var dt = $('#preset_table').DataTable();
+
+    var syncNumDisplay = function(){
+
+        dt.rows().every(function(){
+            var pNum = +this.data()[0];
+
+            if(gcp.config.programAccessMode == 0){
+                // Bank 10
+                var bank10Labels = "0123456789ABCDEFGHIJ";
+                dt.cell(pNum, 1).data(sprintf("%s%d", bank10Labels[Math.floor(pNum/10)], pNum%10));
+            } else {
+                // Bank 4
+                var bank4Labels = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                dt.cell(pNum, 1).data(sprintf("%s%d", bank4Labels[Math.floor(pNum/4)], pNum%4 + 1));
+            }
+        });
+
+    };
+
+    syncNumDisplay();
+
+    $(document).on('config:programAccessMode:change', function(event, data){
+        syncNumDisplay();
+        dt.draw();
+    });
+
+    dt.rows().every(function(){
+        var $p = $(this.node());
+        var pNum = +this.data()[0];
 
         var syncDev = function(d, $changes){
             var $d = $(sprintf('<div class="checkbox"><label><input type="checkbox" class="preset_device_enabled" data-device="%d"> <span class="preset_device_enabled_title">%s</span></label></div>', d, gcp.config.deviceNames[d])).appendTo($changes);
@@ -329,6 +376,8 @@ function renderPreset(){
             sync();
         });
 
+        sync();
+
         $p.find('.presetName').blur(function(){
             $(this).val(gcp.presets[pNum].setPresetName($(this).val()));
         }).keyup(function(){
@@ -342,29 +391,33 @@ function renderPreset(){
         });
 
         if(gcp.config.pedalsExist[0] == 1 || gcp.config.pedalsExist[1] == 1){
-            $p.find('.presetPedals button').show();
+            $p.find('.presetPedals').show();
+        } else {
+            $p.find('.presetPedals').hide();
         }
         if(gcp.config.numGCX > 0){
-            $p.find('.loopStates button').show();
+            $p.find('.loopStates').show();
+        } else {
+            $p.find('.loopStates').hide();
         }
 
         $(document).on('config:pedalExists:change', function(event, data){
             if(gcp.config.pedalsExist[0] == 1 || gcp.config.pedalsExist[1] == 1) {
-                $p.find('.presetPedals button').show();
+                $p.find('.presetPedals').show();
             } else {
-                $p.find('.presetPedals button').hide();
+                $p.find('.presetPedals').hide();
             }
         });
 
         $(document).on('config:numGCX:change', function(event, data){
             if(gcp.config.numGCX > 0){
-                $p.find('.loopStates button').show();
+                $p.find('.loopStates').show();
             } else {
-                $p.find('.loopStates button').hide();
+                $p.find('.loopStates').hide();
             }
         });
 
-        $p.find('.presetPedals button').unbind('click').click(function(){
+        $p.find('.presetPedals').unbind('click').click(function(){
             var $dialog = $('<div/>').appendTo($('body'));
 
             var buildPC = function(p){
@@ -433,7 +486,7 @@ function renderPreset(){
             });
         });
 
-        $p.find('.loopStates button').unbind('click').click(function(){
+        $p.find('.loopStates').unbind('click').click(function(){
             var $dialog = $('<div/>').appendTo($('body'));
 
             var $table = $('<table/>').appendTo($dialog);
@@ -523,7 +576,7 @@ function renderPreset(){
             });
         });
 
-        $p.find('.iaStates button').unbind('click').click(function(){
+        $p.find('.iaStates').unbind('click').click(function(){
             var $dialog = $('<div/>').appendTo($('body'));
 
             var buildIa = function(ia){
@@ -567,8 +620,9 @@ function renderPreset(){
 
         });
 
-        sync();
     });
+
+    dt.draw();
 }
 
 function renderConfig(){
@@ -736,6 +790,7 @@ function renderConfig(){
 
     $base.find('.programAccessMode').change(function(){
         gcp.config.programAccessMode = +$(this).val();
+        $(document).trigger('config:programAccessMode:change', [{}]);
     }).val(gcp.config.programAccessMode);
 
     $base.find('.directorySpeed').change(function(){

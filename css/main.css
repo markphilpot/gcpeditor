@@ -89,3 +89,7 @@
 .loopStates button {
     display: none;
 }
+
+#preset_table .even {
+    background-color: #f4f4f4;
+}
