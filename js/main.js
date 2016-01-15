@@ -43,6 +43,10 @@ $(function(){
         gcp.download();
     });
 
+    $('#export-csv').click(function(){
+        gcp.downloadCSV();
+    });
+
     $('#copy-presets').click(function(){
 
         if($(this).attr('data-next') == 'done') {
@@ -97,6 +101,82 @@ $(function(){
             $('.copy-p').remove();
         }
 
+    });
+
+    $('#import-csv').click(function(){
+
+        var csvPresets = null;
+
+        var $dialog = $('<div/>').appendTo($('body'));
+        $("<p>Import presets from a CSV export</p>").appendTo($dialog);
+        var $drop = $('<div class="import_drop">Drop .csv file here</div>').appendTo($dialog);
+
+        $drop.bind('dragover', function(e){
+            e.stopPropagation();
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'copy';
+        });
+
+        $drop.bind('drop', function(e){
+            e.stopPropagation();
+            e.preventDefault();
+
+            var f = e.dataTransfer.files[0];
+
+            Papa.parse(f, {
+                header: false,
+                complete: function(results, file){
+                    // For some reason we might have to handle extra conditions here...
+                    if(results.data.length == 201){
+                        csvPresets = results.data.slice(1);
+                    } else if (results.data.length > 201){
+                        csvPresets = results.data.slice(1, NUM_PRESETS+1);
+                    }
+
+                    $('<h3>CSV Uploaded</h3>').appendTo($dialog);
+                },
+                error: function(error, file){
+                    console.log(error);
+                }
+            });
+        });
+
+        $dialog.dialog({
+            title: 'Import Presets from CSV',
+            autoOpen: true,
+            closeOnEscape: true,
+            width: 500,
+            height: 400,
+            buttons: [
+                {
+                    text: "Import",
+                    click: function(){
+
+                        var result = gcp.presetsFromCSV(csvPresets);
+
+                        $(document).trigger('presets:import', [{}]);
+
+                        $dialog.dialog('close');
+
+                        if(result){
+                            $.jGrowl("CSV Import complete");
+                        } else {
+                            $.jGrowl("Error importing from CSV")
+                        }
+
+                    }
+                }, {
+                    text: "Cancel",
+                    click: function(){
+                        $dialog.dialog('close');
+                    }
+                }
+            ]
+        });
+
+        $dialog.on('dialogclose', function(e){
+            $dialog.remove();
+        });
     });
 
     $('#import-presets').click(function(){

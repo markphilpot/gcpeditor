@@ -12,6 +12,7 @@
     "bootbox": "~4.4.0",
     "DataTables": "~1.10.7",
     "datatables-bootstrap3": "*",
-    "bootstrap-switch": "~3.3.2"
+    "bootstrap-switch": "~3.3.2",
+    "papa.parse": "~4.1.0"
   }
 }

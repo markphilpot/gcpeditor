@@ -170,6 +170,82 @@ Preset.prototype.compile = function(){
 
     return buffer;
 };
+Preset.prototype.toCSV = function(){
+    var self = this;
+
+    // Columns
+    // 0 - Preset Name
+    // 1 - Device #1 On/Off
+    // 2 - Device #1 Preset
+    // 3-16 - Device #X On/Off, Device #X Preset
+    // 17 - Pedal #1 Device
+    // 18 - Pedal #1 Assignment
+    // 19 - Pedal #2 Device
+    // 20 - Pedal #2 Assignment
+    // 21 - GCX Loop State (4*8)
+    //    - GCX Toggles (4)
+    //    - Instant Access (8)
+
+    var row = [];
+
+    row.push(self.name);
+
+    for(var i = 0; i < NUM_DEVICES; i++){
+        row.push(self.deviceProgramChanges[i].onOff);
+        row.push(self.deviceProgramChanges[i].pc);
+    }
+
+    for(var i = 0; i < NUM_PEDALS; i++){
+        row.push(self.pedalDefinitions[i]);
+        row.push(self.pedalDeviceAssignments[i]);
+    }
+
+    for(var i = 0; i < NUM_GCX * NUM_GCX_LOOPS; i++ ){
+        row.push(self.gcxLoopStates[i]);
+    }
+    for(var i = 0; i < NUM_GCX; i++){
+        row.push(self.gcxToggles[i]);
+    }
+    for(var i = 0; i < NUM_INSTANT_ACCESS; i++){
+        row.push(self.instantAccessState[i]);
+    }
+
+    return row;
+}
+Preset.prototype.fromCSV = function(row){
+    var self = this;
+
+    var NAME_OFFSET = 0;
+    var DEV_PC_OFFSET = 1;
+    var PEDAL_OFFSET = DEV_PC_OFFSET + (2*NUM_DEVICES);
+    var GCX_STATE_OFFSET = PEDAL_OFFSET + (2*NUM_PEDALS);
+    var GCX_TOGGLE_OFFSET = GCX_STATE_OFFSET + (NUM_GCX * NUM_GCX_LOOPS);
+    var IA_OFFSET = GCX_TOGGLE_OFFSET + NUM_GCX;
+
+    self.name = row[NAME_OFFSET];
+    for(var i = 0; i < NUM_DEVICES; i++){
+        var onOff = row[DEV_PC_OFFSET+(2*i)];
+        var pc = row[DEV_PC_OFFSET+(2*i)+1];
+        self.deviceProgramChanges[i].onOff = onOff;
+        self.deviceProgramChanges[i].pc = pc;
+    }
+    for(var i = 0; i < NUM_PEDALS; i++){
+        var pedalDef = row[PEDAL_OFFSET+i];
+        var pedalDevAssignment = row[PEDAL_OFFSET+i+1];
+        self.pedalDefinitions[i] = pedalDef;
+        self.pedalDeviceAssignments[i] = pedalDevAssignment;
+    }
+    for(var i = 0; i <  NUM_GCX * NUM_GCX_LOOPS; i++){
+        self.gcxLoopStates[i] = row[GCX_STATE_OFFSET+i];
+    }
+    for(var i = 0; i < NUM_GCX; i++){
+        self.gcxToggles[i] = row[GCX_TOGGLE_OFFSET+i];
+    }
+    for(var i = 0; i < NUM_INSTANT_ACCESS; i++){
+        self.instantAccessState[i] = row[IA_OFFSET+i];
+    }
+}
+
 
 var SoftOptions = function(){
     this.val = 0;
@@ -449,6 +525,74 @@ GcpSyxEx.prototype.compile = function(){
 
     return self.sysEx.buffer;
 };
+
+GcpSyxEx.prototype.presetsToCSV = function(){
+    var self = this;
+
+    // Columns
+    // 0 - Preset Name
+    // 1 - Device #1 On/Off
+    // 2 - Device #1 Preset
+    // 3-16 - Device #X On/Off, Device #X Preset
+    // 17 - Pedal #1 Device
+    // 18 - Pedal #1 Assignment
+    // 19 - Pedal #2 Device
+    // 20 - Pedal #2 Assignment
+    // 21 - GCX Loop State (4*8)
+    //    - GCX Toggles (4)
+    //    - Instant Access (8)
+
+    var csv = [];
+
+    var headers = [
+        'Preset Name',
+    ]
+
+    for(var i = 0; i < NUM_DEVICES; i++){
+        headers.push(sprintf("Device #%d On/Off", i+1));
+        headers.push(sprintf("Device #%d Preset", i+1));
+    }
+    for(var i = 0; i < NUM_PEDALS; i++){
+        headers.push(sprintf('Pedal #%d Device', i+1));
+        headers.push(sprintf('Pedal #%d Assignment', i+1));
+    }
+    for(var i = 0; i < (NUM_GCX * NUM_GCX_LOOPS); i++){
+        headers.push(sprintf('GCX #%d Loop #%d', (i/NUM_GCX)+1, (i%NUM_GCX_LOOPS)+1));
+    }
+    for(var i = 0; i < NUM_GCX; i++){
+        headers.push(sprintf('GCX #%d Toggle', i+1));
+    }
+    for(var i = 0; i < NUM_INSTANT_ACCESS; i++){
+        headers.push(sprintf('IA #%d', i+1))
+    }
+
+    csv.push(headers);
+
+    self.presets.forEach(function(p, index){
+        csv.push(p.toCSV())
+    });
+
+    return Papa.unparse(csv);
+}
+GcpSyxEx.prototype.presetsFromCSV = function(csv){
+    var self = this;
+
+    if(csv.length != NUM_PRESETS){
+        console.error('Invalid CSV File')
+        return false;
+    }
+
+    for(var i = 0; i < NUM_PRESETS; i++){
+        self.presets[i].fromCSV(csv[i]);
+    }
+
+    return true;
+}
+
+GcpSyxEx.prototype.downloadCSV = function(){
+    var blob = new Blob([this.presetsToCSV()], {type: "text/csv;charset=utf-8"});
+    saveAs(blob, "presets.csv");
+}
 
 GcpSyxEx.prototype.download = function(){
     var blob = new Blob([this.compile()], {type: "application/octet-stream"});
