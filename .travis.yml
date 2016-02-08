@@ -1,0 +1,21 @@
+language: node_js
+node_js:
+  - "4.1"
+before_install:
+  - "npm install -g bower"
+install:
+  - "bower install"
+script: "echo NOOP"
+deploy:
+  provider: s3
+  access_key_id: $AWS_ACCESS_KEY # Env
+  secret_access_key: $AWS_SECRET_KEY # Env
+  bucket: gcproeditor.com
+  endpoint: gcproeditor.com.s3-website-us-east-1.amazonaws.com
+  region: us-east-1
+  skip_cleanup: true
+  acl: public_read
+  detect_encoding: true
+notifications:
+  email:
+    on_failure: always
