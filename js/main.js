@@ -832,7 +832,7 @@ function renderConfig(){
         } else {
             gcp.config.softOptions.setRespond(0);
         }
-    }).val(gcp.config.softOptions.getRespond());
+    }).prop('checked', gcp.config.softOptions.getRespond() == 1 ? true : false);
 
     $base.find('.softOptions_global').change(function(){
         gcp.config.softOptions.setGlobalProgram(+$(this).val());

@@ -305,7 +305,7 @@ var Config = function () {
     this.programAccessMode = 0x00;
     this.softOptions = new SoftOptions();
     this.directorySpeed = 0x02;
-    this.programChangeReceiveChannel = 0x01;
+    this.programChangeReceiveChannel = 0x00;
 
     // Instant Access Buttons
     this.switchFunctions = [];
