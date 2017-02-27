@@ -230,8 +230,8 @@ Preset.prototype.fromCSV = function(row){
         self.deviceProgramChanges[i].pc = pc;
     }
     for(var i = 0; i < NUM_PEDALS; i++){
-        var pedalDef = row[PEDAL_OFFSET+i];
-        var pedalDevAssignment = row[PEDAL_OFFSET+i+1];
+        var pedalDef = row[PEDAL_OFFSET+(2*i)];
+        var pedalDevAssignment = row[PEDAL_OFFSET+(2*i)+1];
         self.pedalDefinitions[i] = pedalDef;
         self.pedalDeviceAssignments[i] = pedalDevAssignment;
     }
