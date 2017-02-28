@@ -475,7 +475,7 @@ function renderPreset(){
                     $('<option value="1">Pitchbend</option>').appendTo($sel);
                     $('<option value="2">Aftertouch</option>').appendTo($sel);
                     for(var i = 3; i < 124; i++){
-                        $(sprintf('<option value="%d">MIDI Controller #%d</option>', i, i-2)).appendTo($sel);
+                        $(sprintf('<option value="%d">MIDI Controller #%d</option>', i, i-3)).appendTo($sel);
                     }
                 }
 
