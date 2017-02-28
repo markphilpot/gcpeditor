@@ -246,20 +246,32 @@ Preset.prototype.fromCSV = function(row){
     }
 }
 
-
+// From Spec:
+// 76543210 # Bit numbers for \/\/
+// X0XX000X where X=don’t care and 0 is used as follows: 
+//      D1=Global Program ON(1)/OFF(0) 
+//      D3,D2=Link Mode:NONE(00), MASTER(01), or SLAVE(10) 
+//      D6=Respond to MIDI Program Change, ON(1)/OFF(0)
+//
+// Note: It seems the GCP device (v1.13 firmware at least) doesn't obey the spec.
+//       The Global Program bit is bit 0, rather than bit 1, so the pattern is
+//       X0XX00X0 instead.  The code below reflects that.
+//
+// Some Examples:
+// 01 == Global Program: ON, Link Mode: NONE, Respond to MIDI PC: OFF
+// 41 == Global Program: ON, Link Mode: NONE, Respond to MIDI PC: ON
 var SoftOptions = function(){
     this.val = 0;
 
-    this.PROG_MASK = 0x80;
-    this.PROG_UMASK = 0x7F;
-    this.PROG_SHIFT = 7;
-    this.LINK_MASK = 0x30;
-    this.LINK_UMASK = 0xCF;
-    this.LINK_SHIFT = 4;
-    this.RESPOND_MASK = 0x01;
-    this.RESPOND_UMASK = 0xFE;
-    this.RESPOND_SHIFT = 0;
-
+    this.PROG_MASK = 0x01; // 0000 0001
+    this.PROG_UMASK = 0xFE; // 1111 1110
+    this.PROG_SHIFT = 0;
+    this.LINK_MASK = 0x0C; // 0000 1100
+    this.LINK_UMASK = 0xF3; // 1111 0011
+    this.LINK_SHIFT = 2;
+    this.RESPOND_MASK = 0x40; // 0100 0000
+    this.RESPOND_UMASK = 0xBF; // 1011 1111
+    this.RESPOND_SHIFT = 6;
 };
 SoftOptions.prototype.init = function(val){
     this.val = val;
