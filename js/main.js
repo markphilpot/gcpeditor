@@ -783,11 +783,18 @@ function renderConfig(){
             } else {
                 // MIDI Controller #
                 for (var i = 0; i < 121; i++) {
-                    $(sprintf('<option value="%d">MIDI Controller #%d</option>', i, i + 1)).appendTo($detailSel);
+                    $(sprintf('<option value="%d">MIDI Controller #%d</option>', i, i)).appendTo($detailSel);
                 }
 
-                $btn.find('.switchFunctionDetail').parent().hide();
-                $btn.find('.transmitCC').parent().show();
+                $btn.find('.switchFunctionDetail').parent().show();
+
+                // If switchType is Momentary, the GCP doesn't transmit CC
+                if(gcp.config.switchType[btnNum] == 1) {
+                    $btn.find('.transmitCC').parent().hide();
+                } else {
+                    $btn.find('.transmitCC').parent().show();
+                }
+
                 $btn.find('.switchType').parent().show();
             }
 
@@ -811,6 +818,7 @@ function renderConfig(){
 
         $btn.find('.switchType').change(function(){
             gcp.config.switchType[btnNum] = +$(this).val();
+            renderFcnDetail();
         }).val(gcp.config.switchType[btnNum]);
     });
 
