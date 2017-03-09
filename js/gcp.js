@@ -9,8 +9,13 @@ var NUM_GCX_SWITCHES = 8;
 var NUM_SWITCH_FCN = 8;
 var NUM_INSTANT_ACCESS = 8;
 
-var NUM_BANKS = 20;
-var NUM_PRESETS_PER_BANK = 10;
+// programAccessMode 10
+var NUM_BANKS_10 = 20;
+var NUM_PRESETS_PER_BANK_10 = 10;
+
+// programAccessMode
+var NUM_BANKS_4 = 36;
+var NUM_PRESETS_PER_BANK_4 = 4;
 
 var PREAMBLE = [0xF0, 0x00, 0x00, 0x07, 0x10];
 var TERMINATOR = [0xF7];

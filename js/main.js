@@ -317,29 +317,43 @@ function init(){
         $clone.attr('data-btn', i);
         $clone.find('label span').html(i+1);
     }
+}
+
+// Global programAccessMode State
+var BANK_OF_10 = 0; // 0 == Banks of 10 (0-9, A-J)
+var BANK_OF_4 = 1; // 1 == Banks of 4 (0-9, A-Z)
+var __bankLayout = BANK_OF_10;
+
+function renderPresetBanks(){
+    var $base = $('#gcp');
+
+    __bankLayout = gcp.config.programAccessMode;
 
     var $bankList = $base.find('#presetPanel .tab-content');
     var $bankNav = $base.find('#presetPanel .nav-tabs');
 
-    var $preset = $base.find('#presetPanel .preset');
+    $bankList.html('');
+    $bankNav.html('');
+
+    var $presetTemplate = $('#presetTemplate');
 
     var banks = [];
-    var bankLabels = "0123456789ABCDEFGHIJ";
-    for(var i = 0; i < NUM_BANKS; i++ ){
-        if(i != 0){
-            $(sprintf('<li role="presentation"><a href="#bank%d" aria-controls="presets" role="tab" data-toggle="tab">%s</a></li>', i, bankLabels[i])).appendTo($bankNav);
-            $(sprintf('<div role="tabpanel" class="tab-pane" id="bank%d"></div>', i)).appendTo($bankList);
-        }
+    var bankLabels = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    var numBanks = __bankLayout == BANK_OF_10 ? NUM_BANKS_10 : NUM_BANKS_4;
+    for(var i = 0; i < numBanks; i++ ){
+        $(sprintf('<li role="presentation" %s><a href="#bank%d" aria-controls="presets" role="tab" data-toggle="tab">%s</a></li>', i == 0 ? 'class="active"' : '', i, bankLabels[i])).appendTo($bankNav);
+        $(sprintf('<div role="tabpanel" class="tab-pane" id="bank%d"></div>', i)).appendTo($bankList);
 
         banks[i] = $(sprintf('#bank%d', i));
+
+        if(i == 0){
+            banks[i].addClass('active');
+        }
     }
 
     for(var i = 0; i < NUM_PRESETS; i++){
-        if(i == 0){
-            continue;
-        }
-
-        var $clone = $preset.clone().appendTo(banks[Math.floor(i/10)]);
+        var $clone = $presetTemplate.clone().appendTo(banks[Math.floor(i/(__bankLayout == BANK_OF_10 ? 10 : 4))]);
 
         $clone.attr('data-preset', i);
         $clone.find('.preset-label-num').html(i);
@@ -348,6 +362,11 @@ function init(){
 
 function render(){
     renderConfig();
+    renderPresets();
+}
+
+function renderPresets(){
+    renderPresetBanks();
     renderPreset();
 }
 
@@ -824,6 +843,7 @@ function renderConfig(){
 
     $base.find('.programAccessMode').change(function(){
         gcp.config.programAccessMode = +$(this).val();
+        renderPresets(); // Rerender
     }).val(gcp.config.programAccessMode);
 
     $base.find('.directorySpeed').change(function(){

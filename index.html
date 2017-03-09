@@ -263,13 +263,14 @@
                             <div role="tabpanel">
 
                                 <ul class="nav nav-tabs" role="tablist">
-                                    <li role="presentation" class="active">
+                                    <!-- li role="presentation" class="active">
                                         <a href="#bank0" aria-controls="presets" role="tab" data-toggle="tab">Bank 0</a>
-                                    </li>
-                                    <!-- Replicated by js -->
+                                    </li -->
+                                    <!-- Inserted by js -->
                                 </ul>
 
                                 <div class="tab-content">
+                                    <!--
                                     <div role="tabpanel" class="tab-pane active" id="bank0">
                                         <div class="preset" data-preset="0">
                                             <form class="form-inline">
@@ -288,8 +289,8 @@
                                                     <button type="button" class="btn btn-default">Instant Access</button>
                                                 </div>
                                             </form>
-                                        </div>
-                                        <!-- Replicated by js -->
+                                        </div> -->
+                                        <!-- Inserted by js -->
                                     </div>
                                     <!-- Replicated by js -->
                                 </div>
@@ -335,6 +336,28 @@
                     <p><em>Always</em> have backups of your configurations.  Use at your own discretion.</p>
                 </div>
                 <div class="col-md-2"></div>
+            </div>
+        </div>
+
+        <!-- Templates -->
+        <div style="display: none;">
+            <div class="preset" data-preset="0" id="presetTemplate">
+                <form class="form-inline">
+                    <div class="form-group">
+                        <label>Preset <span class="preset-label-num">0</span> <input type="text" class="form-control presetName" size="11" maxlength="10"></label>
+                    </div>
+                    <div class="deviceProgramChanges form-group">
+                    </div>
+                    <div class="presetPedals">
+                        <button type="button" class="btn btn-default">Pedals</button>
+                    </div>
+                    <div class="loopStates">
+                        <button type="button" class="btn btn-default">GCX Loop States</button>
+                    </div>
+                    <div class="iaStates">
+                        <button type="button" class="btn btn-default">Instant Access</button>
+                    </div>
+                </form>
             </div>
         </div>
 
